@@ -3,17 +3,18 @@
 <head>
   <meta charset="utf-8">
   <title>인명구조함 위치 (카카오 지도)</title>
-  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=8e58993e2eac9a82b8a92fb59929b52f"></script>
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=8e58993e2eac9a82bfa59929652f&autoload=true"></script>
 </head>
 <body>
   <div id="map" style="width:100%;height:90vh;"></div>
+
   <script>
     var map = new kakao.maps.Map(document.getElementById('map'), {
-        center: new kakao.maps.LatLng(37.75, 128.9),
-        level: 8
+      center: new kakao.maps.LatLng(37.75, 128.9),
+      level: 8
     });
 
-    fetch("/lifesavers")
+    fetch("https://gangneung-lifesaver-api-vcj2.onrender.com/lifesavers")
       .then(res => res.json())
       .then(data => {
         data.forEach(loc => {
