@@ -7,13 +7,14 @@
 </head>
 <body>
   <div id="map" style="width:100%;height:90vh;"></div>
+
   <script>
     var map = new naver.maps.Map('map', {
-        center: new naver.maps.LatLng(37.75, 128.9),
-        zoom: 11
+      center: new naver.maps.LatLng(37.77, 128.9),
+      zoom: 11
     });
 
-    fetch("/lifesavers")
+    fetch("https://gangneung-lifesaver-api-vcj2.onrender.com/lifesavers")
       .then(res => res.json())
       .then(data => {
         data.forEach(loc => {
