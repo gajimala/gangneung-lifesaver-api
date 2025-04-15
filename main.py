@@ -1,12 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import json
 
 app = FastAPI()
 
+app.mount("/", StaticFiles(directory="public", html=True), name="public")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 실제 서비스 시엔 필요한 도메인만 허용
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
