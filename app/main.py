@@ -5,7 +5,7 @@ import json
 
 app = FastAPI()
 
-with open("gangneung_lifesavers.json", "r", encoding="utf-8-sig") as f:
+with open("gangneung_lifesavers.json", "r", encoding="utf-8") as f:
     lifesavers = json.load(f)
 
 @app.get("/")
