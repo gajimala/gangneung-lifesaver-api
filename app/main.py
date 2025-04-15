@@ -1,18 +1,19 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 import json
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+with open("gangneung_lifesavers.json", "r", encoding="utf-8") as f:
+    lifesavers = json.load(f)
+
+@app.get("/")
+def read_root():
+    return {"message": "Lifesaver API is running!"}
 
 @app.get("/lifesavers")
 def get_lifesavers():
-    with open("gangneung_lifesavers.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-    return data
+    return JSONResponse(content=lifesavers)
+
+app.mount("/public", StaticFiles(directory="public"), name="public")

@@ -2,39 +2,25 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>강릉 인명구조함 지도 - 카카오</title>
-  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d02572eca2dd38bbbbb6692254d51bb7"></script>
-  <style>
-    #map { width: 100%; height: 100vh; }
-  </style>
+  <title>인명구조함 위치 (카카오 지도)</title>
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=8e58993e2eac9a82b8a92fb59929b52f"></script>
 </head>
 <body>
-  <div id="map"></div>
+  <div id="map" style="width:100%;height:90vh;"></div>
   <script>
-    const mapContainer = document.getElementById('map');
-    const mapOption = {
-      center: new kakao.maps.LatLng(37.75, 128.9),
-      level: 6
-    };
+    var map = new kakao.maps.Map(document.getElementById('map'), {
+        center: new kakao.maps.LatLng(37.75, 128.9),
+        level: 8
+    });
 
-    const map = new kakao.maps.Map(mapContainer, mapOption);
-
-    fetch("https://gangneung-lifesaver-api-vcj2.onrender.com/lifesavers")
+    fetch("/lifesavers")
       .then(res => res.json())
       .then(data => {
-        data.forEach(item => {
-          const marker = new kakao.maps.Marker({
-            position: new kakao.maps.LatLng(item.lat, item.lon),
+        data.forEach(loc => {
+          new kakao.maps.Marker({
             map: map,
-            title: item.type || "구조함"
-          });
-
-          const infowindow = new kakao.maps.InfoWindow({
-            content: `<div style="padding:5px;font-size:14px;">${item.type}<br>${item.address}</div>`
-          });
-
-          kakao.maps.event.addListener(marker, 'click', function() {
-            infowindow.open(map, marker);
+            position: new kakao.maps.LatLng(loc.lat, loc.lon),
+            title: loc.name
           });
         });
       });
