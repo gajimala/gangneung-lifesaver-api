@@ -13,8 +13,8 @@ app.add_middleware(
 )
 
 with open("gangneung_lifesavers.json", "r", encoding="utf-8") as f:
-    lifesavers = json.load(f)
+    lifesavers_data = json.load(f)
 
 @app.get("/lifesavers")
 def get_lifesavers():
-    return lifesavers
+    return lifesavers_data
