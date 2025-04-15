@@ -3,28 +3,30 @@
 <head>
   <meta charset="utf-8">
   <title>인명구조함 위치 (네이버 지도)</title>
-  <script src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=y6akfogygp"></script>
 </head>
 <body>
-  <div id="map" style="width:100%;height:90vh;"></div>
+  <div id="map" style="width:100%;height:500vh;"></div>
 
+  <script src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=y6akfogygp"></script>
   <script>
-    var map = new naver.maps.Map('map', {
-      center: new naver.maps.LatLng(37.77, 128.9),
-      zoom: 11
-    });
+    document.addEventListener('DOMContentLoaded', function () {
+      var map = new naver.maps.Map('map', {
+        center: new naver.maps.LatLng(37.77, 128.9),
+        zoom: 12
+      });
 
-    fetch("https://gangneung-lifesaver-api-vcj2.onrender.com/lifesavers")
-      .then(res => res.json())
-      .then(data => {
-        data.forEach(loc => {
-          new naver.maps.Marker({
-            map: map,
-            position: new naver.maps.LatLng(loc.lat, loc.lon),
-            title: loc.name
+      fetch("https://gangneung-lifesaver-api-vcj2.onrender.com/lifesavers")
+        .then(res => res.json())
+        .then(data => {
+          data.forEach(loc => {
+            new naver.maps.Marker({
+              map: map,
+              position: new naver.maps.LatLng(loc.lat, loc.lon),
+              title: loc.name
+            });
           });
         });
-      });
+    });
   </script>
 </body>
 </html>
