@@ -1,10 +1,11 @@
+import os
+import json
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import json
 
 app = FastAPI()
 
-# CORS 설정 (모든 도메인 허용)
+# CORS 허용
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -13,13 +14,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# JSON 파일 불러오기
-with open("gangneung_lifesavers.json", "r", encoding="utf-8") as f:
-    lifesavers = json.load(f)
+# JSON 파일 절대경로로 안전하게 읽기
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+JSON_PATH = os.path.join(BASE_DIR, "gangneung_lifesavers.json")
 
-@app.get("/")
-def root():
-    return {"message": "Gangneung Lifesaver API is running."}
+with open(JSON_PATH, "r", encoding="utf-8") as f:
+    lifesavers = json.load(f)
 
 @app.get("/lifesavers")
 def get_lifesavers():
