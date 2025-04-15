@@ -1,22 +1,18 @@
-import os
-import json
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import json
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # 실제 서비스 시엔 필요한 도메인만 허용
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-JSON_PATH = os.path.join(BASE_DIR, "gangneung_lifesavers.json")
-
-with open(JSON_PATH, "r", encoding="utf-8") as f:
+with open("gangneung_lifesavers.json", "r", encoding="utf-8") as f:
     lifesavers = json.load(f)
 
 @app.get("/lifesavers")
