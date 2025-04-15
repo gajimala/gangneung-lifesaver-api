@@ -1,9 +1,7 @@
 services:
   - type: web
-    name: gangneung-lifesaver-api
+    name: lifesaver-api
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "bash start.sh"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port 10000"
     plan: free
-    branch: main
-    autoDeploy: true
