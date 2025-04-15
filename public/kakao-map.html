@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>카카오 지도 - 인명구조함</title>
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=카카오APPKEY&libraries=services"></script>
+</head>
+<body>
+  <h1>Gangneung Lifesavers - Kakao Map</h1>
+  <div id="map" style="width:100%;height:600px;"></div>
+  <script>
+    var map = new kakao.maps.Map(document.getElementById('map'), {
+      center: new kakao.maps.LatLng(37.75, 128.9),
+      level: 7
+    });
+    fetch("/lifesavers")
+      .then(res => res.json())
+      .then(data => {
+        data.forEach(item => {
+          new kakao.maps.Marker({
+            map: map,
+            position: new kakao.maps.LatLng(item.latitude, item.longitude)
+          });
+        });
+      });
+  </script>
+</body>
+</html>

@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: lifesaver-api
+    name: gangneung-lifesaver-api
     env: python
-    buildCommand: ""
-    startCommand: bash start.sh
-    envVars:
-      - key: PORT
-        value: 10000
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "bash start.sh"
+    plan: free
+    branch: main
+    autoDeploy: true

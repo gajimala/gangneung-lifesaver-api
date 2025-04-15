@@ -27,9 +27,10 @@ def get_lifesavers():
             **item,
             "latitude": item["lat"],
             "longitude": item["lon"]
-        } for item in lifesavers_data
+        }
+        for item in lifesavers_data
     ]
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))  # Render가 제공하는 포트 사용
+    port = int(os.environ.get("PORT", 8000))
     uvicorn.run("main:app", host="0.0.0.0", port=port)
