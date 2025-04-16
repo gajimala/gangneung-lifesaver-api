@@ -1,27 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <title>인명구조함 위치 (카카오 지도)</title>
-  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=8e58993e2eac9a82bfa59929652f&autoload=true"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>인명구조함 지도 (카카오)</title>
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=여기에_APPKEY_입력&libraries=clusterer"></script>
+  <style>
+    html, body, #map {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
 </head>
 <body>
-  <div id="map" style="width:100%;height:90vh;"></div>
-
+  <div id="map"></div>
   <script>
-    var map = new kakao.maps.Map(document.getElementById('map'), {
+    const map = new kakao.maps.Map(document.getElementById('map'), {
       center: new kakao.maps.LatLng(37.75, 128.9),
-      level: 8
+      level: 9
     });
 
     fetch("https://gangneung-lifesaver-api-vcj2.onrender.com/lifesavers")
       .then(res => res.json())
       .then(data => {
-        data.forEach(loc => {
+        data.forEach(item => {
           new kakao.maps.Marker({
+            position: new kakao.maps.LatLng(item.lat, item.lon),
             map: map,
-            position: new kakao.maps.LatLng(loc.lat, loc.lon),
-            title: loc.name
+            title: item.name || "인명구조함"
           });
         });
       });

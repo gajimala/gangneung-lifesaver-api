@@ -12,12 +12,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-with open("gangneung_lifesavers.json", "r", encoding="utf-8") as f:
+with open("gangneung_lifesavers.json", encoding="utf-8") as f:
     lifesavers = json.load(f)
-
-@app.get("/")
-def root():
-    return {"message": "Gangneung Lifesaver API is running"}
 
 @app.get("/lifesavers")
 def get_lifesavers():
