@@ -4,10 +4,11 @@ import json
 
 app = FastAPI()
 
-# CORS 설정
+# CORS 설정 (모든 도메인 허용)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -16,7 +17,7 @@ app.add_middleware(
 with open("gangneung_lifesavers.json", "r", encoding="utf-8") as f:
     lifesavers = json.load(f)
 
-# /lifesavers 엔드포인트
+# 라우터 설정
 @app.get("/lifesavers")
-def get_lifesavers():
+def read_lifesavers():
     return lifesavers
