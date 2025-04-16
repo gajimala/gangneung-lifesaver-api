@@ -1,30 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   <title>인명구조함 위치 (네이버 지도)</title>
+  <!-- 네이버 지도 API - clientId는 네이버 콘솔에서 등록된 clientId로 바꿔야 함 -->
+  <script src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=y6akfoygyp"></script>
 </head>
 <body>
-  <div id="map" style="width:100%;height:500vh;"></div>
-
-  <script src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=y6akfogygp"></script>
+  <div id="map" style="width:100%; height:600px;"></div>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      var map = new naver.maps.Map('map', {
+    document.addEventListener("DOMContentLoaded", function () {
+      const map = new naver.maps.Map("map", {
         center: new naver.maps.LatLng(37.77, 128.9),
-        zoom: 12
+        zoom: 12,
       });
 
       fetch("https://gangneung-lifesaver-api-vcj2.onrender.com/lifesavers")
-        .then(res => res.json())
-        .then(data => {
-          data.forEach(loc => {
+        .then((res) => res.json())
+        .then((data) => {
+          data.forEach((loc) => {
             new naver.maps.Marker({
               map: map,
-              position: new naver.maps.LatLng(loc.lat, loc.lon),
-              title: loc.name
+              position: new naver.maps.LatLng(loc.lat, loc.lon), // API에 맞게 수정됨
+              title: loc.name,
             });
           });
+        })
+        .catch((err) => {
+          console.error("🚨 마커 표시 오류 발생:", err);
         });
     });
   </script>
