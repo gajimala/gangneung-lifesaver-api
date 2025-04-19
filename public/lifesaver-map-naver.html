@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>인명구조함 지도 (네이버)</title>
-  <script src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=y6akfogygp"></script>
+  <script src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=3vxnfjmxg9"></script>
   <style>
     html, body, #map { width: 100%; height: 100%; margin: 0; padding: 0; }
   </style>
@@ -17,7 +17,7 @@
       zoom: 11
     });
 
-    fetch("/lifesavers")
+    fetch("https://gangneung-lifesaver-api-vcj2.onrender.com/lifesavers")
       .then(res => res.json())
       .then(data => {
         data.forEach(item => {
