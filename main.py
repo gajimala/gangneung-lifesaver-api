@@ -20,7 +20,7 @@ app.add_middleware(
 )
 
 # JSON 경로 고정 (Render 환경 포함)
-BASE_DIR = os.path.dirname(__file__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 JSON_PATH = os.path.join(BASE_DIR, "gangneung_lifesavers.json")
 
 # lifesaver 데이터 로드
