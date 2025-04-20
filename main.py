@@ -28,3 +28,8 @@ def read_root():
 @app.get("/lifesavers")
 def get_lifesavers():
     return lifesavers
+
+@app.get("/nationwide")
+def get_nationwide_lifesavers():
+    with open("nationwide_lifesavers_cleaned.json", encoding="utf-8") as f:
+        return json.load(f)
