@@ -18,14 +18,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# lifesaver 데이터 로드 (절대경로 사용)
-json_path = os.path.join(os.path.dirname(__file__), "gangneung_lifesavers.json")
-with open(json_path, "r", encoding="utf-8") as f:
-    lifesavers = json.load(f)
+# lifesaver 데이터 로드 (전국 좌표만, 오류 로깅 포함)
+json_path = os.path.join(os.path.dirname(__file__), "nationwide_lifesavers_coordinates_only.json")
+
+try:
+    with open(json_path, "r", encoding="utf-8") as f:
+        lifesavers = json.load(f)
+except Exception as e:
+    print("🔥 JSON 로딩 실패:", e)
+    lifesavers = []
 
 @app.get("/api")
 def read_root():
-    return {"message": "인명구조함 API 동작 중"}
+    return {"message": "전국 인명구조함 API (좌표만) 동작 중"}
 
 @app.get("/lifesavers")
 def get_lifesavers():
