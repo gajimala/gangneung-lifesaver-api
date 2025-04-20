@@ -4,3 +4,16 @@ services:
     env: python
     buildCommand: "pip install -r requirements.txt"
     startCommand: "sh start.sh"
+    autoDeploy: false
+    buildFilter:
+      paths:
+        - main.py
+        - gangneung_lifesavers.json         # ✅ JSON 파일 명시
+        - start.sh
+        - requirements.txt
+        - render.yaml
+        - public/
+        - README.md
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
