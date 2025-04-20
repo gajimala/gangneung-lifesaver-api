@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+import os
 import json
 
 app = FastAPI()
@@ -17,8 +18,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# lifesaver 데이터 로드
-with open("gangneung_lifesavers.json", "r", encoding="utf-8") as f:
+# JSON 경로를 명확하게 고정
+BASE_DIR = os.path.dirname(__file__)
+JSON_PATH = os.path.join(BASE_DIR, "gangneung_lifesavers.json")
+
+with open(JSON_PATH, "r", encoding="utf-8") as f:
     lifesavers = json.load(f)
 
 @app.get("/api")
