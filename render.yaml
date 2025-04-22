@@ -6,15 +6,6 @@ services:
     startCommand: "sh start.sh"
     autoDeploy: false
     buildFilter:
-     paths:
+      paths:
         - main.py
-        - gangneung_lifesavers.json
-        - nationwide_lifesavers_coordinates_only.json  # ✅ 이 항목 반드시 있어야 함
-        - start.sh
-        - requirements.txt
-        - render.yaml
-        - public/
-        - README.md
-    envVars:
-      - key: PYTHONUNBUFFERED
-        value: "1"
+        - nationwide_lifesavers_coordinates_only.json
