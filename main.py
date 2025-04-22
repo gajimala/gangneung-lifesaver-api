@@ -16,7 +16,7 @@ app.add_middleware(
 )
 
 # 정적 파일 서빙 경로 등록
-app.mount("/static", StaticFiles(directory="public"), name="static")
+app.mount("/", StaticFiles(directory="public", html=True), name="static")
 
 # JSON 데이터 로드
 DATA_FILE = os.path.join(os.path.dirname(__file__), "nationwide_lifesavers_coordinates_only.json")
