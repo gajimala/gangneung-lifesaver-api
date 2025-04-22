@@ -4,8 +4,12 @@ services:
     env: python
     buildCommand: "pip install -r requirements.txt"
     startCommand: "sh start.sh"
-    autoDeploy: false
+    autoDeploy: true
     buildFilter:
       paths:
         - main.py
-        - nationwide_lifesavers_coordinates_only.json
+        - start.sh
+        - render.yaml
+        - requirements.txt
+        - public/**
+        - *.json
