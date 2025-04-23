@@ -1,33 +1,28 @@
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import json
 import os
 
 app = FastAPI()
+
+# CORS 설정
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# 정적 파일 서빙 경로 등록
+app.mount("/", StaticFiles(directory="public", html=True), name="static")
 
 # JSON 데이터 로드
 DATA_FILE = os.path.join(os.path.dirname(__file__), "nationwide_lifesavers_coordinates_only.json")
 with open(DATA_FILE, "r", encoding="utf-8") as f:
     lifesavers = json.load(f)
 
-# /lifesavers 경로 설정 (JSON 데이터 반환)
 @app.get("/lifesavers")
 def get_lifesavers():
     return lifesavers
-
-# /lifesaver-map-naver 경로에서 HTML 파일 제공
-@app.get("/lifesaver-map-naver")
-def get_lifesaver_map():
-    with open("lifesaver-map-naver.html", "r", encoding="utf-8") as f:
-        html_content = f.read()
-    return HTMLResponse(content=html_content)
-
-# / 경로에서 기본 응답 추가 (GET)
-@app.get("/")
-def read_root():
-    return {"message": "홈페이지로 연결되었습니다!"}
-
-# / 경로에서 HEAD 요청 처리 추가
-@app.head("/")
-def head_root():
-    return {"message": "HEAD 요청이 성공적으로 처리되었습니다!"}

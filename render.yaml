@@ -11,4 +11,5 @@ services:
         - start.sh
         - render.yaml
         - requirements.txt
+        - public/**
         - *.json
