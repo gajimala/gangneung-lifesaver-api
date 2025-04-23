@@ -23,6 +23,7 @@ def get_lifesaver_map():
     return HTMLResponse(content=html_content)
 
 # / 경로 설정 (기본 홈 페이지 반환)
-@app.get("/")
-def read_root():
+@app.head("/")
+def head_root():
     return {"message": "홈페이지로 연결되었습니다!"}
+
