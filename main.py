@@ -2,11 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import json
+import os
 
 app = FastAPI()
-
-# 정적 파일 서비스
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 # CORS 설정
 app.add_middleware(
@@ -17,19 +15,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# lifesaver 데이터 로드
-with open("gangneung_lifesavers.json", "r", encoding="utf-8") as f:
-    lifesavers = json.load(f)
+# 정적 파일 서빙 경로 등록
+app.mount("/", StaticFiles(directory="public", html=True), name="static")
 
-@app.get("/api")
-def read_root():
-    return {"message": "인명구조함 API 동작 중"}
+# JSON 데이터 로드
+DATA_FILE = os.path.join(os.path.dirname(__file__), "nationwide_lifesavers_coordinates_only.json")
+with open(DATA_FILE, "r", encoding="utf-8") as f:
+    lifesavers = json.load(f)
 
 @app.get("/lifesavers")
 def get_lifesavers():
     return lifesavers
-
-@app.get("/nationwide")
-def get_nationwide_lifesavers():
-    with open("nationwide_lifesavers_cleaned.json", encoding="utf-8") as f:
-        return json.load(f)
