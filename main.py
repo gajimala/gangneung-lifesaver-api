@@ -23,6 +23,6 @@ DATA_FILE = os.path.join(os.path.dirname(__file__), "nationwide_lifesavers_coord
 with open(DATA_FILE, "r", encoding="utf-8") as f:
     lifesavers = json.load(f)
 
-@app.get("/lifesavers")
-def get_lifesavers():
-    return lifesavers
+@app.get("/")
+def read_root():
+    return {"message": "홈페이지로 연결되었습니다!"}
