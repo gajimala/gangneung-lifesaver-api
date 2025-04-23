@@ -18,8 +18,6 @@ app.add_middleware(
 
 # JSON 데이터 로드
 DATA_FILE = os.path.join(os.path.dirname(__file__), "nationwide_lifesavers_coordinates_only.json")
-
-# JSON 파일을 읽어서 데이터 로드
 with open(DATA_FILE, "r", encoding="utf-8") as f:
     lifesavers = json.load(f)
 
@@ -27,9 +25,16 @@ with open(DATA_FILE, "r", encoding="utf-8") as f:
 def get_lifesavers():
     return lifesavers  # JSON 데이터를 반환
 
-# /lifesaver-map-naver 경로에서 HTML 파일 서빙
+# 정적 파일 서빙 경로 수정 (퍼블릭 폴더 사용)
+app.mount("/static", StaticFiles(directory="public", html=True), name="static")
+
+# /lifesaver-map-naver 경로에서 HTML 파일 제공 (퍼블릭 폴더 내 파일)
 @app.get("/lifesaver-map-naver")
 def get_lifesaver_map():
-    with open("public/lifesaver-map-naver.html", "r", encoding="utf-8") as f:
-        html_content = f.read()
-    return HTMLResponse(content=html_content)  # HTML 파일을 반환
+    try:
+        # public 폴더에 있는 lifsaver-map-naver.html 파일을 불러옵니다.
+        with open("public/lifesaver-map-naver.html", "r", encoding="utf-8") as f:
+            html_content = f.read()
+        return HTMLResponse(content=html_content)
+    except FileNotFoundError:
+        return {"error": "HTML file not found"}
