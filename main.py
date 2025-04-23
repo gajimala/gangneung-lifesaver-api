@@ -16,7 +16,7 @@ app.add_middleware(
 )
 
 # 정적 파일 서빙 경로 수정 (URL 경로를 /static으로 변경)
-app.mount("/static", StaticFiles(directory="public", html=True), name="static")
+app.mount("/static", StaticFiles(directory="static", html=True), name="static")
 
 # JSON 데이터 로드
 DATA_FILE = os.path.join(os.path.dirname(__file__), "nationwide_lifesavers_coordinates_only.json")
@@ -26,3 +26,4 @@ with open(DATA_FILE, "r", encoding="utf-8") as f:
 @app.get("/lifesavers")
 def get_lifesavers():
     return lifesavers
+
