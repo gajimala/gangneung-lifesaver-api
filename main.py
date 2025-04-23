@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 import json
 import os
 
@@ -16,7 +17,7 @@ app.add_middleware(
 )
 
 # 정적 파일 서빙 경로 등록
-app.mount("/", StaticFiles(directory="public", html=True), name="static")
+app.mount("/static", StaticFiles(directory="static", html=True), name="static")
 
 # JSON 데이터 로드
 DATA_FILE = os.path.join(os.path.dirname(__file__), "nationwide_lifesavers_coordinates_only.json")
@@ -26,3 +27,10 @@ with open(DATA_FILE, "r", encoding="utf-8") as f:
 @app.get("/lifesavers")
 def get_lifesavers():
     return lifesavers
+
+@app.get("/lifesaver-map-naver")
+def get_lifesaver_map():
+    # Render에서 정적 파일 서빙이므로 static 폴더에 파일이 있어야 합니다.
+    with open("static/lifesaver-map-naver.html", "r", encoding="utf-8") as f:
+        html_content = f.read()
+    return HTMLResponse(content=html_content)
