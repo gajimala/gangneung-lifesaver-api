@@ -10,14 +10,19 @@ DATA_FILE = os.path.join(os.path.dirname(__file__), "nationwide_lifesavers_coord
 with open(DATA_FILE, "r", encoding="utf-8") as f:
     lifesavers = json.load(f)
 
+# /lifesavers 경로 설정 (JSON 데이터 반환)
 @app.get("/lifesavers")
 def get_lifesavers():
     return lifesavers
 
-# HTML 파일 서빙 (StaticFiles 제거하고 직접 응답)
+# /lifesaver-map-naver 경로에서 HTML 파일 제공
 @app.get("/lifesaver-map-naver")
 def get_lifesaver_map():
     with open("lifesaver-map-naver.html", "r", encoding="utf-8") as f:
         html_content = f.read()
     return HTMLResponse(content=html_content)
 
+# / 경로 설정 (기본 홈 페이지 반환)
+@app.get("/")
+def read_root():
+    return {"message": "홈페이지로 연결되었습니다!"}
