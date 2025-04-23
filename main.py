@@ -6,7 +6,7 @@ import json
 app = FastAPI()
 
 # 정적 파일 서비스
-app.mount("/", StaticFiles(directory="public", html=True), name="static")
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 # CORS 설정
 app.add_middleware(
