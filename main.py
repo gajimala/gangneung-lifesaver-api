@@ -20,7 +20,7 @@ app.mount("/", StaticFiles(directory="public", html=True), name="static")
 
 # lifesavers.json 파일을 정확히 열어서 데이터 로드
 DATA_FILE = os.path.join(os.path.dirname(__file__), "lifesavers.json")
-with open(lifesavers.json, "r", encoding="utf-8") as f:
+with open(DATA_FILE, "r", encoding="utf-8") as f:
     lifesavers = json.load(f)
 
 @app.get("/api")
