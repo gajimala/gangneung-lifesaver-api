@@ -22,7 +22,12 @@ def get_lifesaver_map():
         html_content = f.read()
     return HTMLResponse(content=html_content)
 
-# / 경로에서 기본 응답 추가
+# / 경로에서 기본 응답 추가 (GET)
 @app.get("/")
 def read_root():
     return {"message": "홈페이지로 연결되었습니다!"}
+
+# / 경로에서 HEAD 요청 처리 추가
+@app.head("/")
+def head_root():
+    return {"message": "HEAD 요청이 성공적으로 처리되었습니다!"}
