@@ -19,7 +19,7 @@ app.add_middleware(
 app.mount("/", StaticFiles(directory="public", html=True), name="static")
 
 # lifesaver 데이터 로드
-with open("nationwide_lifesavers_coordinates_only", "r", encoding="utf-8") as f:
+with open("lifesavers", "r", encoding="utf-8") as f:
     lifesavers = json.load(f)
 
 @app.get("/api")
