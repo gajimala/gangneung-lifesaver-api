@@ -23,7 +23,7 @@ DATA_FILE = os.path.join(os.path.dirname(__file__), "nationwide_lifesavers_coord
 with open(DATA_FILE, "r", encoding="utf-8") as f:
     lifesavers = json.load(f)
 
-@app.get("/lifesavers")
+@app.get("/nationwide_lifesavers_coordinates_only")
 def get_lifesavers():
     return lifesavers
 
