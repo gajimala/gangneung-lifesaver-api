@@ -15,8 +15,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 정적 파일 서빙 경로 등록
-app.mount("/", StaticFiles(directory="public", html=True), name="static")
+# 정적 파일 서빙 경로 수정 (URL 경로를 /static으로 변경)
+app.mount("/static", StaticFiles(directory="public", html=True), name="static")
 
 # JSON 데이터 로드
 DATA_FILE = os.path.join(os.path.dirname(__file__), "nationwide_lifesavers_coordinates_only.json")
