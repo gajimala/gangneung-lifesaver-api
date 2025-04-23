@@ -24,8 +24,8 @@ with open(DATA_FILE, "r", encoding="utf-8") as f:
     lifesavers = json.load(f)
 
 @app.get("/nationwide_lifesavers_coordinates_only")
-def get_lifesavers():
-    return lifesavers
+def get_nationwide_lifesavers_coordinates_only():
+    return nationwide_lifesavers_coordinates_only
 
 # HTML 파일 제공 (퍼블릭 폴더 내 파일)
 @app.get("/lifesaver-map-naver")
