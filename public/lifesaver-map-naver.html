@@ -42,26 +42,28 @@
       console.error("브라우저가 위치 정보를 지원하지 않습니다.");
     }
 
-    // lifesavers.json 데이터 가져와서 인명구조함 마커 추가
-    fetch("lifesavers.json")
-      .then(function(response) {
-        return response.json();
-      })
-      .then(function(data) {
-        for (var i = 0; i < data.length; i++) {
-          var item = data[i];
-          if (item.lat && item.lon) {
-            var marker = new naver.maps.Marker({
-              position: new naver.maps.LatLng(item.lat, item.lon),
-              map: map,
-              title: item.name || "인명구조함"
-            });
+        // lifesavers.json 먼저 가져온다
+    function loadMarkers() {
+      fetch("lifesavers.json")
+        .then(function(response) {
+          return response.json();
+        })
+        .then(function(data) {
+          for (var i = 0; i < data.length; i++) {
+            var item = data[i];
+            if (item.lat && item.lon) {
+              var marker = new naver.maps.Marker({
+                position: new naver.maps.LatLng(item.lat, item.lon),
+                map: map,
+                title: item.name || "인명구조함"
+              });
+            }
           }
-        }
-      })
-      .catch(function(error) {
-        console.error('마커 생성 오류:', error);
-      });
+        })
+        .catch(function(error) {
+          console.error('lifesavers.json 불러오기 오류:', error);
+        });
+    }
+    
+    loadMarkers(); // ✅ 이거 추가해야 구조함 마커들이 찍힌다
   </script>
-</body>
-</html>
