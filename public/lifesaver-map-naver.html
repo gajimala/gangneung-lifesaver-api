@@ -7,8 +7,6 @@
   <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=y6akfogygp"></script>
   <style>
     html, body, #map { width: 100%; height: 100%; margin: 0; padding: 0; }
-    
-    /* ✅ 네이버 지도 스타일처럼 버튼 다듬음 */
     #locationButton {
       position: absolute;
       top: 10px;
@@ -31,7 +29,6 @@
   
   <div id="map"></div>
 
-  <!-- ✅ 내 위치로 이동 버튼 추가 -->
   <button id="locationButton">내 위치로 이동</button>  
 
 <script>
@@ -44,7 +41,6 @@
   var lifesavers = []; // 구조함 데이터 저장
   var myLocationMarker = null; // 내 위치 파란 마커
 
-
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
       var myLat = position.coords.latitude;
@@ -54,7 +50,6 @@
       map.setCenter(myLocation);
       map.setZoom(17);
 
-      // ✅ 내 위치 파란 마커 찍기
       myLocationMarker = new naver.maps.Marker({
         position: myLocation,
         map: map,
@@ -63,7 +58,6 @@
           anchor: new naver.maps.Point(6, 6)
         }
       });
-
     }, function(error) {
       console.error("위치 정보를 가져올 수 없습니다:", error);
     });
@@ -94,13 +88,12 @@
             });
             markers.push(marker);
 
-            // ✅ 마커 클릭 시 info window 띄우기
-            var infoWindow = new naver.maps.InfoWindow({
-              content: '<div style="padding:6px; font-size:13px;">' + (item.name || "인명구조함") + '</div>'
-            });
-
+            // ✅ 마커 클릭 시 길찾기 바로 열기
             naver.maps.Event.addListener(marker, 'click', function() {
-              infoWindow.open(map, marker);
+              const lat = item.lat;
+              const lon = item.lng;
+              const url = `https://map.naver.com/v5/directions/-/${lat},${lon}`;
+              window.open(url, '_blank');
             });
           }
         });
@@ -112,43 +105,6 @@
       });
   }
 
-        for (var i = 0; i < data.length; i++) {
-          var item = data[i];
-          if (item.lat && item.lng) {
-            var marker = new naver.maps.Marker({
-              position: new naver.maps.LatLng(item.lat, item.lng),
-              map: map, // ✅ 마커가 지도에 실제로 표시되도록
-              title: item.name || "인명구조함",
-              icon: {
-                url: "/lifesaver-icon.png", // ✅ 커스텀 마커 이미지 경로
-                size: new naver.maps.Size(27, 30),      // ← 여기 줄임
-                scaledSize: new naver.maps.Size(27, 30), // ← 여기도 줄임
-                origin: new naver.maps.Point(0, 0),
-                anchor: new naver.maps.Point(13, 30)
-              }
-            });
-            markers.push(marker);
-
-             // ✅ 마커 클릭시 길찾기 열기 추가
-            (function(marker, item) {
-              naver.maps.Event.addListener(marker, 'click', function() {
-                const lat = item.lat;
-                const lon = item.lng;
-                const url = `https://map.naver.com/v5/directions/-/${lat},${lon}`;
-                window.open(url, '_blank');
-              });
-            })(marker, item);
-          }
-        }
-
-        updateMarkers(); // 초기화 때 한 번 업데이트
-      })
-      .catch(function(error) {
-        console.error('lifesavers.json 불러오기 오류:', error);
-      });
-  }
-
-  // 화면 범위 안에 있는 마커만 보여주기
   function updateMarkers() {
     if (lifesavers.length === 0) return;
 
@@ -160,9 +116,9 @@
       var item = lifesavers[index];
       if (item.lat >= sw._lat && item.lat <= ne._lat &&
           item.lng >= sw._lng && item.lng <= ne._lng) {
-        marker.setMap(map);   // 범위 안 → 보여줌
+        marker.setMap(map);
       } else {
-        marker.setMap(null);  // 범위 밖 → 숨김
+        marker.setMap(null);
       }
     });
   }
@@ -173,16 +129,16 @@
 
   loadMarkers(); // 구조함 데이터 불러오기
 
-  // ✅ 내 위치로 이동 버튼 기능
   document.getElementById('locationButton').addEventListener('click', function() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function (position) {
         var myLat = position.coords.latitude;
         var myLon = position.coords.longitude;
-        map.setCenter(new naver.maps.LatLng(myLat, myLon));
+        var myLocation = new naver.maps.LatLng(myLat, myLon);
+
+        map.setCenter(myLocation);
         map.setZoom(17);
 
-   // ✅ 내 위치 파란 마커 이동
         if (myLocationMarker) {
           myLocationMarker.setPosition(myLocation);
         } else {
@@ -195,7 +151,6 @@
             }
           });
         }
-
       }, function (error) {
         alert('위치 정보를 가져올 수 없습니다.');
       });
