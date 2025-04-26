@@ -5,6 +5,7 @@ services:
     buildCommand: "pip install -r requirements.txt"
     startCommand: "sh start.sh"
     autoDeploy: true
+    staticPublishPath: public  # ✅ 추가! "/static/" 경로 자동 연결
     buildFilter:
       paths:
         - main.py
