@@ -97,8 +97,8 @@
             });
             markers.push(marker);
 
-            // URL 생성 (c=줌레벨,경도,위도)
-            var url = `https://map.naver.com/p/directions?c=15.00,${destLon},${destLat}&placeSearch=${destName}&placeLat=${destLat}&placeLon=${destLon}`;
+            // ✅ c= 빼고 placeLat, placeLon 만 사용
+            var url = `https://map.naver.com/p/directions?placeSearch=${destName}&placeLat=${destLat}&placeLon=${destLon}`;
 
             var infoWindow = new naver.maps.InfoWindow({
               content: `
