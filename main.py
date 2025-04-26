@@ -18,11 +18,3 @@ app.add_middleware(
 # 정적 파일 서빙 경로 등록
 app.mount("/", StaticFiles(directory="public", html=True), name="static")
 
-# JSON 데이터 로드
-DATA_FILE = os.path.join(os.path.dirname(__file__), "lifesavers.json")
-with open(DATA_FILE, "r", encoding="utf-8") as f:
-    lifesavers = json.load(f)
-
-@app.get("/lifesavers")
-def get_lifesavers():
-    return lifesavers
