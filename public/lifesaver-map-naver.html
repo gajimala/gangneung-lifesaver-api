@@ -1,32 +1,41 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>인명구조함 지도 (네이버)</title>
-  <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=y6akfogygp"></script>
+  <meta charset="UTF-8">
+  <title>경국 전국 인명구조함 지도</title>
+  <script src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=y6akfogygp"></script>
   <style>
-    html, body, #map { width: 100%; height: 100%; margin: 0; padding: 0; }
+    #map {
+      width: 100%;
+      height: 100vh;
+    }
   </style>
 </head>
 <body>
   <div id="map"></div>
+
   <script>
-    const map = new naver.maps.Map('map', {
-      center: new naver.maps.LatLng(37.75, 128.9),
-      zoom: 11
+    // 지도 초기화
+    var map = new naver.maps.Map('map', {
+      center: new naver.maps.LatLng(36.5, 127.5), // 대한민국 경중점
+      zoom: 7
     });
 
-    fetch("https://gangneung-lifesaver-api-vcj2.onrender.com/lifesavers")
-      .then(res => res.json())
+    // lifesavers.json 데이터 가져오고 마켓 채워넣기
+    fetch('lifesavers.json')
+      .then(response => response.json())
       .then(data => {
         data.forEach(item => {
           new naver.maps.Marker({
-            map: map,
             position: new naver.maps.LatLng(item.lat, item.lon),
-            title: item.name || "인명구조함"
+            map: map,
+            title: "인명구조함" // 명칭 고정
           });
         });
+      })
+      .catch(error => {
+        console.error('\ub370이\ud130 \ub85c\ub4dc \uc624\ub958:', error);
       });
   </script>
 </body>
