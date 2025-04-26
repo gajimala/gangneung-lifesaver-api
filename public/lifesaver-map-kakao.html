@@ -20,6 +20,7 @@
 
   var markers = [];
   var lifesavers = [];
+  var infoWindow = new kakao.maps.InfoWindow(); // 인포윈도우 하나만 재사용
 
   // 내 위치 가져오기
   if (navigator.geolocation) {
@@ -51,16 +52,34 @@
               title: item.name || "인명구조함",
               image: new kakao.maps.MarkerImage(
                 "/lifesaver-icon.png", // ✅ 커스텀 마커 아이콘
-                new kakao.maps.Size(40, 45), // 사이즈
-                { offset: new kakao.maps.Point(20, 45) } // 기준점
+                new kakao.maps.Size(40, 45),
+                { offset: new kakao.maps.Point(20, 45) }
               )
               // map: map ← 초기에는 안 올린다!
             });
             markers.push(marker);
+
+            // ✅ 마커 클릭 이벤트에 설명창(인포윈도우) 열기
+            kakao.maps.event.addListener(marker, 'click', function() {
+              var name = item.name || "인명구조함";
+              var url = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${item.lat},${item.lng}`;
+
+              var iwContent = `
+                <div style="padding:6px; font-size:13px;">
+                  ${name}<br>
+                  <button onclick="window.location.href='${url}'" style="margin-top:5px; background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
+                    길찾기
+                  </button>
+                </div>
+              `;
+
+              infoWindow.setContent(iwContent);
+              infoWindow.open(map, marker);
+            });
           }
         }
 
-        updateMarkers(); // 초기화 때 한번 호출
+        updateMarkers(); // 초기화 때 한 번 호출
       })
       .catch(error => {
         console.error('lifesavers.json 불러오기 오류:', error);
