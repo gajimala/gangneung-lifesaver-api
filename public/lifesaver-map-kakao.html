@@ -6,8 +6,8 @@
   <title>인명구조함 지도 (카카오)</title>
   <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d02572eca2dd38bbbbb6692254d51bb7&libraries=clusterer"></script>
   <style>
-    html, body, #map { width: 100%; height: 100%; margin: 0; padding: 0; }
-    #locationButton {
+    html, body, #map, #roadview { width: 100%; height: 100%; margin: 0; padding: 0; }
+    #locationButton, #mapTypeSelector, #roadviewButton {
       position: absolute;
       top: 10px;
       left: 10px;
@@ -20,7 +20,7 @@
       font-size: 14px;
       cursor: pointer;
     }
-    #locationButton:hover {
+    #locationButton:hover, #mapTypeSelector:hover, #roadviewButton:hover {
       background: rgba(240, 240, 240, 0.9);
     }
   </style>
@@ -28,14 +28,15 @@
 <body>
 
 <div id="map"></div>
-
 <button id="locationButton">내 위치로 이동</button>
-<button id="mapTypeSelector">위성 지도</button> <!-- 지도 타입 선택 버튼 -->
+<button id="mapTypeSelector">항공뷰</button> <!-- 지도 타입 선택 버튼 -->
+<button id="roadviewButton">로드뷰</button> <!-- 로드뷰 활성화 버튼 -->
 
 <script>
   const map = new kakao.maps.Map(document.getElementById('map'), {
     center: new kakao.maps.LatLng(37.75, 128.9),
-    level: 9
+    level: 9,
+    mapTypeId: kakao.maps.MapTypeId.NORMAL // 기본 지도 타입 설정
   });
 
   var markers = [];
@@ -44,6 +45,21 @@
   var myLon = null;
   var myLocationMarker = null;
   var infoWindow = new kakao.maps.InfoWindow();
+
+  // 항공뷰 (스카이뷰) 지도
+  map.setMapTypeId(kakao.maps.MapTypeId.SKYVIEW);  // 기본 지도 타입을 항공뷰로 설정
+
+  // 로드뷰 객체 생성
+  const roadview = new kakao.maps.Roadview(document.getElementById('roadview'));
+  const roadviewClient = new kakao.maps.RoadviewClient();
+
+  // 로드뷰 위치 설정
+  const roadviewPosition = new kakao.maps.LatLng(37.5665, 126.9780); // 서울시청 위치
+
+  // 로드뷰 활성화
+  roadviewClient.getNearestPanoId(roadviewPosition, function(panoId) {
+    roadview.setPanoId(panoId, roadviewPosition);
+  });
 
   function getMyLocation() {
     if (navigator.geolocation) {
@@ -150,16 +166,21 @@
     getMyLocation();
   });
 
-  // 지도 종류 선택 기능 (위성 지도 전환)
+  // 지도 종류 선택 기능 (항공뷰 전환)
   var mapTypeButton = document.getElementById('mapTypeSelector');
   mapTypeButton.addEventListener('click', function() {
-    if (map.getMapTypeId() === kakao.maps.MapTypeId.SATELLITE) {
+    if (map.getMapTypeId() === kakao.maps.MapTypeId.SKYVIEW) {
       map.setMapTypeId(kakao.maps.MapTypeId.NORMAL);  // 일반 지도
-      mapTypeButton.textContent = '위성 지도';  // 버튼 텍스트 변경
+      mapTypeButton.textContent = '항공뷰';  // 버튼 텍스트 변경
     } else {
-      map.setMapTypeId(kakao.maps.MapTypeId.SATELLITE);  // 위성 지도
+      map.setMapTypeId(kakao.maps.MapTypeId.SKYVIEW);  // 항공뷰
       mapTypeButton.textContent = '일반 지도';  // 버튼 텍스트 변경
     }
+  });
+
+  // 로드뷰 활성화 버튼
+  document.getElementById('roadviewButton').addEventListener('click', function() {
+    roadview.setMap(map);  // 로드뷰 활성화
   });
 </script>
 
