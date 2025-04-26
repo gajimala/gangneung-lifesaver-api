@@ -1,35 +1,4 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>인명구조함 지도 (카카오)</title>
-  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d02572eca2dd38bbbbb6692254d51bb7&libraries=clusterer"></script>
-  <style>
-    html, body, #map { width: 100%; height: 100%; margin: 0; padding: 0; }
-    #locationButton {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 100;
-      padding: 6px 10px;
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-      font-size: 14px;
-      cursor: pointer;
-    }
-    #locationButton:hover {
-      background: rgba(240, 240, 240, 0.9);
-    }
-  </style>
-</head>
-<body>
-
-<div id="map"></div>
-
-<button id="locationButton">내 위치로 이동</button>
+// ...(기존 map, 스타일 부분은 그대로 유지)...
 
 <script>
   const map = new kakao.maps.Map(document.getElementById('map'), {
@@ -81,38 +50,37 @@
         lifesavers = data;
 
         for (var i = 0; i < lifesavers.length; i++) {
-          var item = lifesavers[i];
-          if (item.lat && item.lng) {
-            var marker = new kakao.maps.Marker({
-              position: new kakao.maps.LatLng(item.lat, item.lng),
-              title: item.name || "인명구조함",
-              image: new kakao.maps.MarkerImage(
-                "/lifesaver-icon.png",
-                new kakao.maps.Size(40, 45),
-                { offset: new kakao.maps.Point(20, 45) }
-              )
-            });
-            markers.push(marker);
+          (function(item) { // ✅ 클로저로 감싸서 각각 따로 인식하게
+            if (item.lat && item.lng) {
+              var marker = new kakao.maps.Marker({
+                position: new kakao.maps.LatLng(item.lat, item.lng),
+                title: item.name || "인명구조함",
+                image: new kakao.maps.MarkerImage(
+                  "/lifesaver-icon.png",
+                  new kakao.maps.Size(40, 45),
+                  { offset: new kakao.maps.Point(20, 45) }
+                )
+              });
+              markers.push(marker);
 
-            kakao.maps.event.addListener(marker, 'click', function() {
-              var name = item.name || "인명구조함";
+              kakao.maps.event.addListener(marker, 'click', function() {
+                var name = item.name || "인명구조함";
+                var url = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${item.lat},${item.lng}`;
 
-              // ✅ 카카오맵 링크는 위도, 경도 순서로!!
-              var url = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${item.lat},${item.lng}`;
+                var iwContent = `
+                  <div style="padding:6px; font-size:13px;">
+                    ${name}<br>
+                    <button onclick="window.location.href='${url}'" style="margin-top:5px; background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
+                      길찾기
+                    </button>
+                  </div>
+                `;
 
-              var iwContent = `
-                <div style="padding:6px; font-size:13px;">
-                  ${name}<br>
-                  <button onclick="window.location.href='${url}'" style="margin-top:5px; background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
-                    길찾기
-                  </button>
-                </div>
-              `;
-
-              infoWindow.setContent(iwContent);
-              infoWindow.open(map, marker);
-            });
-          }
+                infoWindow.setContent(iwContent);
+                infoWindow.open(map, marker);
+              });
+            }
+          })(lifesavers[i]); // ← 이렇게 개별로 감싸야 제대로 먹는다
         }
 
         updateMarkers();
@@ -151,6 +119,3 @@
     getMyLocation();
   });
 </script>
-
-</body>
-</html>
