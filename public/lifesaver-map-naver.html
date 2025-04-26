@@ -40,17 +40,16 @@
   var markers = [];
   var lifesavers = [];
   var myLocationMarker = null;
-  var myLat = null;
-  var myLon = null;
 
+  // ✅ 별도 함수로 링크 이동 처리
   function navigateTo(url) {
     window.location.href = url;
   }
 
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
-      myLat = position.coords.latitude;
-      myLon = position.coords.longitude;
+      var myLat = position.coords.latitude;
+      var myLon = position.coords.longitude;
       var myLocation = new naver.maps.LatLng(myLat, myLon);
 
       map.setCenter(myLocation);
@@ -98,11 +97,14 @@
             });
             markers.push(marker);
 
+            // ✅ 길찾기용 URL (경도, 위도 순서로 수정)
+            var url = `https://map.naver.com/p/directions?dest=${destLon},${destLat}&destName=${destName}`;
+
             var infoWindow = new naver.maps.InfoWindow({
               content: `
                 <div style="padding:6px; font-size:13px;">
                   ${item.name || "인명구조함"}<br>
-                  <button onclick="navigateToRoute(${destLat},${destLon},'${item.name || "인명구조함"}')" style="margin-top:5px; background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
+                  <button onclick="navigateTo('${url}')" style="margin-top:5px; background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
                     길찾기
                   </button>
                 </div>
@@ -122,20 +124,6 @@
       });
   }
 
-  function navigateToRoute(destLat, destLon, name) {
-    if (myLat === null || myLon === null) {
-      alert('현재 위치를 가져올 수 없습니다.');
-      return;
-    }
-
-    var origin = `${myLon},${myLat}`;
-    var destination = `${destLon},${destLat}`;
-    var destName = encodeURIComponent(name);
-
-    var url = `https://map.naver.com/p/directions?origin=${origin}&destination=${destination}&destName=${destName}`;
-    window.location.href = url;
-  }
-
   function updateMarkers() {
     if (lifesavers.length === 0) return;
 
@@ -144,4 +132,52 @@
     var ne = bounds.getNE();
 
     markers.forEach(function(marker, index) {
-      var item = lifes
+      var item = lifesavers[index];
+      if (item.lat >= sw._lat && item.lat <= ne._lat &&
+          item.lng >= sw._lng && item.lng <= ne._lng) {
+        marker.setMap(map);
+      } else {
+        marker.setMap(null);
+      }
+    });
+  }
+
+  naver.maps.Event.addListener(map, 'bounds_changed', function() {
+    updateMarkers();
+  });
+
+  loadMarkers();
+
+  document.getElementById('locationButton').addEventListener('click', function() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        var myLat = position.coords.latitude;
+        var myLon = position.coords.longitude;
+        var myLocation = new naver.maps.LatLng(myLat, myLon);
+
+        map.setCenter(myLocation);
+        map.setZoom(17);
+
+        if (myLocationMarker) {
+          myLocationMarker.setPosition(myLocation);
+        } else {
+          myLocationMarker = new naver.maps.Marker({
+            position: myLocation,
+            map: map,
+            icon: {
+              content: '<div style="width:12px; height:12px; background:#4285F4; border-radius:50%; border:2px solid white;"></div>',
+              anchor: new naver.maps.Point(6, 6)
+            }
+          });
+        }
+      }, function (error) {
+        alert('위치 정보를 가져올 수 없습니다.');
+      });
+    } else {
+      alert('이 브라우저에서는 위치 정보 사용이 불가능합니다.');
+    }
+  });
+
+</script>
+</body>
+</html>
