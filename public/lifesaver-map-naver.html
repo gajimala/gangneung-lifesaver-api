@@ -41,11 +41,6 @@
   var lifesavers = [];
   var myLocationMarker = null;
 
-  // ✅ 별도 함수로 링크 이동 처리
-  function navigateTo(url) {
-    window.location.href = url;
-  }
-
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
       var myLat = position.coords.latitude;
@@ -79,12 +74,8 @@
         lifesavers = data;
         data.forEach(function(item) {
           if (item.lat && item.lng) {
-            var destLat = item.lat;
-            var destLon = item.lng;
-            var destName = encodeURIComponent(item.name || "인명구조함");
-
             var marker = new naver.maps.Marker({
-              position: new naver.maps.LatLng(destLat, destLon),
+              position: new naver.maps.LatLng(item.lat, item.lng),
               map: map,
               title: item.name || "인명구조함",
               icon: {
@@ -97,16 +88,14 @@
             });
             markers.push(marker);
 
-           // ✅ 길찾기용 URL (경도, 위도 순서로 수정)
-            var url = `https://map.naver.com/p/directions?dest=${destLon},${destLat}&destName=${destName}`;
-
+            // ✅ 마커 클릭 시 info window 열기 (길찾기 링크 포함)
             var infoWindow = new naver.maps.InfoWindow({
               content: `
                 <div style="padding:6px; font-size:13px;">
                   ${item.name || "인명구조함"}<br>
-                  <button onclick="navigateTo('${url}')" style="margin-top:5px; background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
+                  <a href="https://map.naver.com/v5/directions/null,null,null/${encodeURIComponent(item.name || "인명구조함")},${item.lat},${item.lng}" target="_blank" style="color:blue; text-decoration:underline;">
                     길찾기
-                  </button>
+                  </a>
                 </div>
               `
             });
