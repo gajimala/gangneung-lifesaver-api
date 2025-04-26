@@ -7,10 +7,29 @@
   <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d02572eca2dd38bbbbb6692254d51bb7&libraries=clusterer"></script>
   <style>
     html, body, #map { width: 100%; height: 100%; margin: 0; padding: 0; }
+    #locationButton {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+      font-size: 14px;
+      cursor: pointer;
+    }
+    #locationButton:hover {
+      background: rgba(240, 240, 240, 0.9);
+    }
   </style>
 </head>
 <body>
-  <div id="map"></div>
+
+<div id="map"></div>
+
+<button id="locationButton">내 위치로 이동</button>
 
 <script>
   const map = new kakao.maps.Map(document.getElementById('map'), {
@@ -20,22 +39,39 @@
 
   var markers = [];
   var lifesavers = [];
-  var infoWindow = new kakao.maps.InfoWindow(); // 하나만 재사용
+  var myLat = null;
+  var myLon = null;
+  var myLocationMarker = null;
+  var infoWindow = new kakao.maps.InfoWindow();
 
-  // 내 위치 가져오기
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      var myLat = position.coords.latitude;
-      var myLon = position.coords.longitude;
-      var myLocation = new kakao.maps.LatLng(myLat, myLon);
+  function getMyLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        myLat = position.coords.latitude;
+        myLon = position.coords.longitude;
+        var myLocation = new kakao.maps.LatLng(myLat, myLon);
 
-      map.setCenter(myLocation);
-      map.setLevel(5); // 줌 레벨 조정
-    }, function(error) {
-      console.error("위치 정보를 가져올 수 없습니다:", error);
-    });
-  } else {
-    console.error("브라우저가 위치 정보를 지원하지 않습니다.");
+        map.setCenter(myLocation);
+        map.setLevel(5);
+
+        if (myLocationMarker) {
+          myLocationMarker.setPosition(myLocation);
+        } else {
+          myLocationMarker = new kakao.maps.Marker({
+            position: myLocation,
+            map: map,
+            image: new kakao.maps.MarkerImage(
+              'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
+              new kakao.maps.Size(24, 35)
+            )
+          });
+        }
+      }, function(error) {
+        console.error("위치 정보를 가져올 수 없습니다:", error);
+      });
+    } else {
+      console.error("브라우저가 위치 정보를 지원하지 않습니다.");
+    }
   }
 
   function loadMarkers() {
@@ -44,43 +80,40 @@
       .then(data => {
         lifesavers = data;
 
-        lifesavers.forEach(function(item) {
-          if (item.lat && item.lng) {
-            var marker = new kakao.maps.Marker({
-              position: new kakao.maps.LatLng(item.lat, item.lng),
-              title: item.name || "인명구조함",
-              image: new kakao.maps.MarkerImage(
-                "/lifesaver-icon.png", // ✅ 커스텀 마커 아이콘
-                new kakao.maps.Size(40, 45),
-                { offset: new kakao.maps.Point(20, 45) }
-              )
-            });
-            markers.push(marker);
+        for (var i = 0; i < lifesavers.length; i++) {
+          (function(item) {
+            if (item.lat && item.lng) {
+              var marker = new kakao.maps.Marker({
+                position: new kakao.maps.LatLng(item.lat, item.lng),
+                title: item.name || "인명구조함",
+                image: new kakao.maps.MarkerImage(
+                  "/lifesaver-icon.png",
+                  new kakao.maps.Size(40, 45),
+                  { offset: new kakao.maps.Point(20, 45) }
+                )
+              });
+              markers.push(marker);
 
-            // ✅ 마커 클릭 이벤트
-            kakao.maps.event.addListener(marker, 'click', function() {
-              var name = encodeURIComponent(item.name || "인명구조함");
-              var lat = item.lat;
-              var lng = item.lng;
+              kakao.maps.event.addListener(marker, 'click', function() {
+                var url = `https://map.kakao.com/link/to/인명구조함,${item.lat},${item.lng}`; // ✅ 장소명 고정
 
-              var kakaoUrl = `https://map.kakao.com/link/to/${name},${lat},${lng}`;
+                var iwContent = `
+                  <div style="padding:6px; font-size:13px;">
+                    인명구조함<br>
+                    <button onclick="window.location.href='${url}'" style="margin-top:5px; background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
+                      길찾기
+                    </button>
+                  </div>
+                `;
 
-              var iwContent = `
-                <div style="padding:6px; font-size:13px;">
-                  ${item.name || "인명구조함"}<br>
-                  <button onclick="window.location.href='${kakaoUrl}'" style="margin-top:5px; background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
-                    길찾기
-                  </button>
-                </div>
-              `;
+                infoWindow.setContent(iwContent);
+                infoWindow.open(map, marker);
+              });
+            }
+          })(lifesavers[i]);
+        }
 
-              infoWindow.setContent(iwContent);
-              infoWindow.open(map, marker);
-            });
-          }
-        });
-
-        updateMarkers(); // 초기화 때 호출
+        updateMarkers();
       })
       .catch(error => {
         console.error('lifesavers.json 불러오기 오류:', error);
@@ -98,9 +131,9 @@
       var item = lifesavers[index];
       if (item.lat >= sw.getLat() && item.lat <= ne.getLat() &&
           item.lng >= sw.getLng() && item.lng <= ne.getLng()) {
-        marker.setMap(map); // 범위 안 → 보여줌
+        marker.setMap(map);
       } else {
-        marker.setMap(null); // 범위 밖 → 숨김
+        marker.setMap(null);
       }
     });
   }
@@ -109,7 +142,12 @@
     updateMarkers();
   });
 
+  getMyLocation();
   loadMarkers();
+
+  document.getElementById('locationButton').addEventListener('click', function() {
+    getMyLocation();
+  });
 </script>
 
 </body>
