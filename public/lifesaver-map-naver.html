@@ -7,15 +7,32 @@
   <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=y6akfogygp"></script>
   <style>
     html, body, #map { width: 100%; height: 100%; margin: 0; padding: 0; }
+    
+    /* ✅ 버튼 스타일 추가 */
+    #locationButton {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+      padding: 8px 12px;
+      background: white;
+      border: 1px solid #333;
+      border-radius: 8px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+  
   <div id="map"></div>
+
+  <!-- ✅ 내 위치로 이동 버튼 추가 -->
+  <button id="locationButton">내 위치로 이동</button>  
 
 <script>
   var map = new naver.maps.Map('map', {
     center: new naver.maps.LatLng(37.5665, 126.9780),
-    zoom: 15
+    zoom: 17
   });
 
   var markers = []; // 모든 마커 저장
@@ -28,7 +45,7 @@
       var myLocation = new naver.maps.LatLng(myLat, myLon);
 
       map.setCenter(myLocation);
-      map.setZoom(15);
+      map.setZoom(17);
 
     }, function(error) {
       console.error("위치 정보를 가져올 수 없습니다:", error);
@@ -54,13 +71,23 @@
               title: item.name || "인명구조함",
               icon: {
                 url: "/lifesaver-icon.png", // ✅ 커스텀 마커 이미지 경로
-                size: new naver.maps.Size(40, 45),
-                scaledSize: new naver.maps.Size(40, 45),
+                size: new naver.maps.Size(27, 30),      // ← 여기 줄임
+                scaledSize: new naver.maps.Size(27, 30), // ← 여기도 줄임
                 origin: new naver.maps.Point(0, 0),
-                anchor: new naver.maps.Point(20, 45)
+                anchor: new naver.maps.Point(13, 30)
               }
             });
             markers.push(marker);
+
+             // ✅ 마커 클릭시 길찾기 열기 추가
+            (function(marker, item) {
+              naver.maps.Event.addListener(marker, 'click', function() {
+                const lat = item.lat;
+                const lon = item.lng;
+                const url = `https://map.naver.com/v5/directions/-/${lat},${lon}`;
+                window.open(url, '_blank');
+              });
+            })(marker, item);
           }
         }
 
@@ -95,4 +122,23 @@
   });
 
   loadMarkers(); // 구조함 데이터 불러오기
+
+  // ✅ 내 위치로 이동 버튼 기능
+  document.getElementById('locationButton').addEventListener('click', function() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        var myLat = position.coords.latitude;
+        var myLon = position.coords.longitude;
+        map.setCenter(new naver.maps.LatLng(myLat, myLon));
+        map.setZoom(17);
+      }, function (error) {
+        alert('위치 정보를 가져올 수 없습니다.');
+      });
+    } else {
+      alert('이 브라우저에서는 위치 정보 사용이 불가능합니다.');
+    }
+  });
+
 </script>
+</body>
+</html>
