@@ -97,8 +97,8 @@
             });
             markers.push(marker);
 
-            // ✅ c= 빼고 placeLat, placeLon 만 사용
-            var url = `https://map.naver.com/p/directions?placeSearch=${destName}&placeLat=${destLat}&placeLon=${destLon}`;
+           // ✅ 길찾기용 URL (경도, 위도 순서로 수정)
+            var url = `https://map.naver.com/p/directions?dest=${destLon},${destLat}&destName=${destName}`;
 
             var infoWindow = new naver.maps.InfoWindow({
               content: `
