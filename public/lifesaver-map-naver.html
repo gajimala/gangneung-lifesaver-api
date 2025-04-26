@@ -38,7 +38,7 @@
 
         // lifesavers.json 먼저 가져온다
     function loadMarkers() {
-      fetch("lifesavers.json")
+      fetch("https://gangneung-lifesaver-api-vcj2.onrender.com/public/lifesavers.json")
         .then(function(response) {
           return response.json();
         })
