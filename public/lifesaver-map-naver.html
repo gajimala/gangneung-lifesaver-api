@@ -40,11 +40,17 @@
   var markers = [];
   var lifesavers = [];
   var myLocationMarker = null;
+  var myLat = null;
+  var myLon = null;
+
+  function navigateTo(url) {
+    window.location.href = url;
+  }
 
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
-      var myLat = position.coords.latitude;
-      var myLon = position.coords.longitude;
+      myLat = position.coords.latitude;
+      myLon = position.coords.longitude;
       var myLocation = new naver.maps.LatLng(myLat, myLon);
 
       map.setCenter(myLocation);
@@ -74,8 +80,12 @@
         lifesavers = data;
         data.forEach(function(item) {
           if (item.lat && item.lng) {
+            var destLat = item.lat;
+            var destLon = item.lng;
+            var destName = encodeURIComponent(item.name || "인명구조함");
+
             var marker = new naver.maps.Marker({
-              position: new naver.maps.LatLng(item.lat, item.lng),
+              position: new naver.maps.LatLng(destLat, destLon),
               map: map,
               title: item.name || "인명구조함",
               icon: {
@@ -88,14 +98,13 @@
             });
             markers.push(marker);
 
-            // ✅ 마커 클릭 시 info window 열기 (길찾기 링크 포함)
             var infoWindow = new naver.maps.InfoWindow({
               content: `
                 <div style="padding:6px; font-size:13px;">
                   ${item.name || "인명구조함"}<br>
-                  <a href="https://map.naver.com/v5/directions/null,null,null/${encodeURIComponent(item.name || "인명구조함")},${item.lat},${item.lng}" target="_blank" style="color:blue; text-decoration:underline;">
+                  <button onclick="navigateToRoute(${destLat},${destLon},'${item.name || "인명구조함"}')" style="margin-top:5px; background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
                     길찾기
-                  </a>
+                  </button>
                 </div>
               `
             });
@@ -113,6 +122,20 @@
       });
   }
 
+  function navigateToRoute(destLat, destLon, name) {
+    if (myLat === null || myLon === null) {
+      alert('현재 위치를 가져올 수 없습니다.');
+      return;
+    }
+
+    var origin = `${myLon},${myLat}`;
+    var destination = `${destLon},${destLat}`;
+    var destName = encodeURIComponent(name);
+
+    var url = `https://map.naver.com/p/directions?origin=${origin}&destination=${destination}&destName=${destName}`;
+    window.location.href = url;
+  }
+
   function updateMarkers() {
     if (lifesavers.length === 0) return;
 
@@ -121,52 +144,4 @@
     var ne = bounds.getNE();
 
     markers.forEach(function(marker, index) {
-      var item = lifesavers[index];
-      if (item.lat >= sw._lat && item.lat <= ne._lat &&
-          item.lng >= sw._lng && item.lng <= ne._lng) {
-        marker.setMap(map);
-      } else {
-        marker.setMap(null);
-      }
-    });
-  }
-
-  naver.maps.Event.addListener(map, 'bounds_changed', function() {
-    updateMarkers();
-  });
-
-  loadMarkers();
-
-  document.getElementById('locationButton').addEventListener('click', function() {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function (position) {
-        var myLat = position.coords.latitude;
-        var myLon = position.coords.longitude;
-        var myLocation = new naver.maps.LatLng(myLat, myLon);
-
-        map.setCenter(myLocation);
-        map.setZoom(17);
-
-        if (myLocationMarker) {
-          myLocationMarker.setPosition(myLocation);
-        } else {
-          myLocationMarker = new naver.maps.Marker({
-            position: myLocation,
-            map: map,
-            icon: {
-              content: '<div style="width:12px; height:12px; background:#4285F4; border-radius:50%; border:2px solid white;"></div>',
-              anchor: new naver.maps.Point(6, 6)
-            }
-          });
-        }
-      }, function (error) {
-        alert('위치 정보를 가져올 수 없습니다.');
-      });
-    } else {
-      alert('이 브라우저에서는 위치 정보 사용이 불가능합니다.');
-    }
-  });
-
-</script>
-</body>
-</html>
+      var item = lifes
