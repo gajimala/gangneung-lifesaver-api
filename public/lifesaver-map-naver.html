@@ -28,7 +28,6 @@
 <body>
 
 <div id="map"></div>
-
 <button id="locationButton">내 위치로 이동</button>
 
 <script>
@@ -42,7 +41,7 @@
   var myLocationMarker = null;
   var myLat = null;
   var myLon = null;
-  var infoWindow = null;
+  var infoWindow = new naver.maps.InfoWindow(); // 인포윈도우 하나 재사용
 
   function getMyLocation() {
     if (navigator.geolocation) {
@@ -105,10 +104,20 @@
                 return;
               }
 
-              var appname = 'com.example.app'; // 자유롭게 설정 가능
-              var url = `nmap://route/car?slat=${myLat}&slng=${myLon}&dlat=${item.lat}&dlng=${item.lng}&appname=${appname}`;
+              var appname = 'com.example.app'; // 자유 설정
+              var nmapUrl = `nmap://route/car?slat=${myLat}&slng=${myLon}&dlat=${item.lat}&dlng=${item.lng}&appname=${appname}`;
 
-              window.location.href = url;
+              var iwContent = `
+                <div style="padding:6px; font-size:13px;">
+                  ${item.name || "인명구조함"}<br>
+                  <button onclick="window.location.href='${nmapUrl}'" style="margin-top:5px; background:none; border:none; color:blue; text-decoration:underline; cursor:pointer;">
+                    길찾기 (네이버앱)
+                  </button>
+                </div>
+              `;
+
+              infoWindow.setContent(iwContent);
+              infoWindow.open(map, marker);
             });
           }
         });
