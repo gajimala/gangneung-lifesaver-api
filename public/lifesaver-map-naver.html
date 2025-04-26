@@ -41,6 +41,11 @@
   var lifesavers = [];
   var myLocationMarker = null;
 
+  // ✅ 별도 함수로 링크 이동 처리
+  function navigateTo(url) {
+    window.location.href = url;
+  }
+
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
       var myLat = position.coords.latitude;
@@ -72,4 +77,24 @@
       })
       .then(function(data) {
         lifesavers = data;
-        data
+        data.forEach(function(item) {
+          if (item.lat && item.lng) {
+            var destLat = item.lat;
+            var destLon = item.lng;
+            var destName = encodeURIComponent(item.name || "인명구조함");
+
+            var marker = new naver.maps.Marker({
+              position: new naver.maps.LatLng(destLat, destLon),
+              map: map,
+              title: item.name || "인명구조함",
+              icon: {
+                url: "/lifesaver-icon.png",
+                size: new naver.maps.Size(27, 30),
+                scaledSize: new naver.maps.Size(27, 30),
+                origin: new naver.maps.Point(0, 0),
+                anchor: new naver.maps.Point(13, 30)
+              }
+            });
+            markers.push(marker);
+
+            // URL 생성 (c=줌레벨,경도,위
