@@ -185,35 +185,3 @@
   document.getElementById('locationButton').addEventListener('click', function() {
     getMyLocation();
   });
-
-  // 지도 종류 선택 기능 (항공뷰 전환)
-  var mapTypeButton = document.getElementById('mapTypeSelector');
-  mapTypeButton.addEventListener('click', function() {
-    if (map.getMapTypeId() === kakao.maps.MapTypeId.SKYVIEW) {
-      map.setMapTypeId(kakao.maps.MapTypeId.NORMAL);  // 일반 지도
-      mapTypeButton.textContent = '항공뷰';  // 버튼 텍스트 변경
-    } else {
-      map.setMapTypeId(kakao.maps.MapTypeId.SKYVIEW);  // 항공뷰
-      mapTypeButton.textContent = '일반 지도';  // 버튼 텍스트 변경
-    }
-  });
-
-  // 로드뷰 활성화 버튼
-  var roadviewButton = document.getElementById('roadviewButton');
-  roadviewButton.addEventListener('click', function() {
-    var roadview = new kakao.maps.Roadview(document.getElementById('roadview'));
-    const roadviewClient = new kakao.maps.RoadviewClient();
-
-    // 로드뷰 위치 설정 (예: 서울시청)
-    const roadviewPosition = new kakao.maps.LatLng(37.5665, 126.9780);
-
-    roadviewClient.getNearestPanoId(roadviewPosition, function(panoId) {
-      roadview.setPanoId(panoId, roadviewPosition);
-    });
-
-    roadview.setMap(map); // 로드뷰 활성화
-  });
-</script>
-
-</body>
-</html>
