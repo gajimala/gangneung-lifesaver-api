@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>인명구조함 지도 (내 위치 중심)</title>
+  <title>인명구조함 지도 (네이버 앱용)</title>
   <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=y6akfogygp"></script>
   <style>
     html, body, #map { width: 100%; height: 100%; margin: 0; padding: 0; }
@@ -42,6 +42,7 @@
   var myLocationMarker = null;
   var myLat = null;
   var myLon = null;
+  var infoWindow = null;
 
   function getMyLocation() {
     if (navigator.geolocation) {
@@ -73,7 +74,7 @@
     }
   }
 
-  getMyLocation(); // 처음 실행
+  getMyLocation(); // 처음 위치 잡기
 
   function loadMarkers() {
     fetch("https://gangneung-lifesaver-api.onrender.com/lifesavers.json")
@@ -84,12 +85,8 @@
         lifesavers = data;
         data.forEach(function(item) {
           if (item.lat && item.lng) {
-            var destLat = item.lat;
-            var destLon = item.lng;
-            var destName = encodeURIComponent(item.name || "인명구조함");
-
             var marker = new naver.maps.Marker({
-              position: new naver.maps.LatLng(destLat, destLon),
+              position: new naver.maps.LatLng(item.lat, item.lng),
               map: map,
               title: item.name || "인명구조함",
               icon: {
@@ -107,9 +104,10 @@
                 alert('현재 위치를 가져올 수 없습니다.');
                 return;
               }
-              var origin = `${myLon},${myLat}`;       // 출발지: 내 위치 (경도,위도)
-              var destination = `${destLon},${destLat}`; // 도착지: 구조함 위치 (경도,위도)
-              var url = `https://map.naver.com/p/directions?origin=${origin}&destination=${destination}&destName=${destName}`;
+
+              var appname = 'com.example.app'; // 자유롭게 설정 가능
+              var url = `nmap://route/car?slat=${myLat}&slng=${myLon}&dlat=${item.lat}&dlng=${item.lng}&appname=${appname}`;
+
               window.location.href = url;
             });
           }
@@ -149,7 +147,7 @@
   document.getElementById('locationButton').addEventListener('click', function() {
     getMyLocation();
   });
-
 </script>
+
 </body>
 </html>
