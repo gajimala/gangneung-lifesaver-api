@@ -45,6 +45,12 @@
     mapTypeId: kakao.maps.MapTypeId.NORMAL // 기본 지도 타입 설정
   });
 
+  // 위성 지도 레이어
+  var satelliteLayer = new kakao.maps.TileLayer({
+    tileUrl: 'https://mapapis.kakao.com/tiles/satellite/{z}/{x}/{y}.png', // 위성 지도 타일 URL
+    tileSize: 256
+  });
+
   var markers = [];
   var lifesavers = [];
   var myLat = null;
@@ -163,9 +169,11 @@
     if (map.getMapTypeId() === kakao.maps.MapTypeId.SATELLITE) {
       map.setMapTypeId(kakao.maps.MapTypeId.NORMAL);  // 일반 지도
       mapTypeButton.textContent = '위성 지도';  // 버튼 텍스트 변경
+      satelliteLayer.setMap(null);  // 위성 지도 레이어 제거
     } else {
       map.setMapTypeId(kakao.maps.MapTypeId.SATELLITE);  // 위성 지도
       mapTypeButton.textContent = '일반 지도';  // 버튼 텍스트 변경
+      satelliteLayer.setMap(map);  // 위성 지도 레이어 추가
     }
   });
 </script>
