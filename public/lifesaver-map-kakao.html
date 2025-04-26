@@ -22,7 +22,7 @@
       level: 9
     });
 
-    fetch("https://gangneung-lifesaver-api.onrender.com/lifesavers")
+fetch("https://gangneung-lifesaver-api.onrender.com/lifesavers.json")
       .then(res => res.json())
       .then(data => {
         data.forEach(item => {
