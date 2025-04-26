@@ -12,52 +12,80 @@
 <body>
   <div id="map"></div>
 
-  <script>
-    var map = new naver.maps.Map('map', {
-      center: new naver.maps.LatLng(37.5665, 126.9780), // 기본값 (서울시청 근처) 만약 실패할 경우
-      zoom: 15
+<script>
+  var map = new naver.maps.Map('map', {
+    center: new naver.maps.LatLng(37.5665, 126.9780),
+    zoom: 15
+  });
+
+  var markers = []; // 모든 마커 저장
+  var lifesavers = []; // 구조함 데이터 저장
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var myLat = position.coords.latitude;
+      var myLon = position.coords.longitude;
+      var myLocation = new naver.maps.LatLng(myLat, myLon);
+
+      map.setCenter(myLocation);
+      map.setZoom(15);
+
+    }, function(error) {
+      console.error("위치 정보를 가져올 수 없습니다:", error);
     });
+  } else {
+    console.error("브라우저가 위치 정보를 지원하지 않습니다.");
+  }
 
-    // 내 위치 가져오기
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function(position) {
-        var myLat = position.coords.latitude;
-        var myLon = position.coords.longitude;
-        var myLocation = new naver.maps.LatLng(myLat, myLon);
+  function loadMarkers() {
+    fetch("https://gangneung-lifesaver-api.onrender.com/lifesavers.json")
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        lifesavers = data;
 
-        map.setCenter(myLocation); // 지도 중심을 내 위치로 이동
-        map.setZoom(15); // 줌 레벨도 설정 (선택사항)
-
-
-      }, function(error) {
-        console.error("위치 정보를 가져올 수 없습니다:", error);
-      });
-    } else {
-      console.error("브라우저가 위치 정보를 지원하지 않습니다.");
-    }
-
-        // lifesavers.json 먼저 가져온다
-    function loadMarkers() {
-      fetch("https://gangneung-lifesaver-api.onrender.com/lifesavers.json")
-        .then(function(response) {
-          return response.json();
-        })
-        .then(function(data) {
-          for (var i = 0; i < data.length; i++) {
-            var item = data[i];
-            if (item.lat && item.lng) {
-              var marker = new naver.maps.Marker({
-                position: new naver.maps.LatLng(item.lat, item.lng),
-                map: map,
-                title: item.name || "인명구조함"
-              });
-            }
+        for (var i = 0; i < data.length; i++) {
+          var item = data[i];
+          if (item.lat && item.lng) {
+            var marker = new naver.maps.Marker({
+              position: new naver.maps.LatLng(item.lat, item.lng),
+              title: item.name || "인명구조함"
+              // map: map ← ❌ 여기는 뺀다!!
+            });
+            markers.push(marker);
           }
-        })
-        .catch(function(error) {
-          console.error('lifesavers.json 불러오기 오류:', error);
-        });
-    }
-    
-    loadMarkers(); // ✅ 이거 추가해야 구조함 마커들이 찍힌다
-  </script>
+        }
+
+        updateMarkers(); // 초기화 때 한 번 업데이트
+      })
+      .catch(function(error) {
+        console.error('lifesavers.json 불러오기 오류:', error);
+      });
+  }
+
+  // 화면 범위 안에 있는 마커만 보여주기
+  function updateMarkers() {
+    if (lifesavers.length === 0) return;
+
+    var bounds = map.getBounds();
+    var sw = bounds.getSW();
+    var ne = bounds.getNE();
+
+    markers.forEach(function(marker, index) {
+      var item = lifesavers[index];
+      if (item.lat >= sw._lat && item.lat <= ne._lat &&
+          item.lng >= sw._lng && item.lng <= ne._lng) {
+        marker.setMap(map);   // 범위 안 → 보여줌
+      } else {
+        marker.setMap(null);  // 범위 밖 → 숨김
+      }
+    });
+  }
+
+  naver.maps.Event.addListener(map, 'bounds_changed', function() {
+    updateMarkers();
+  });
+
+  loadMarkers(); // 구조함 데이터 불러오기
+</script>
