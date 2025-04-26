@@ -92,7 +92,9 @@
             naver.maps.Event.addListener(marker, 'click', function() {
               const lat = item.lat;
               const lon = item.lng;
-              const url = `https://map.naver.com/v5/directions/-/${lat},${lon}`;
+              const name = encodeURIComponent(item.name || "인명구조함");
+
+              const url = `https://map.naver.com/v5/directions/null,null,null/${name},${lat},${lon}`;
               window.open(url, '_blank');
             });
           }
