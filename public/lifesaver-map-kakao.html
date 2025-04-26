@@ -45,7 +45,7 @@
     mapTypeId: kakao.maps.MapTypeId.NORMAL // 기본 지도 타입 설정
   });
 
-  // 위성 지도 레이어
+  // 위성 지도 타일 레이어
   var satelliteLayer = new kakao.maps.TileLayer({
     tileUrl: 'https://mapapis.kakao.com/tiles/satellite/{z}/{x}/{y}.png', // 위성 지도 타일 URL
     tileSize: 256
@@ -58,6 +58,7 @@
   var myLocationMarker = null;
   var infoWindow = new kakao.maps.InfoWindow();
 
+  // 내 위치를 가져와서 지도에 설정
   function getMyLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function(position) {
@@ -88,6 +89,7 @@
     }
   }
 
+  // 마커 로딩
   function loadMarkers() {
     fetch("https://gangneung-lifesaver-api.onrender.com/lifesavers.json")
       .then(res => res.json())
