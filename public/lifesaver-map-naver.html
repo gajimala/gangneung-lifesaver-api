@@ -26,10 +26,10 @@
   </style>
 </head>
 <body>
-  
+
   <div id="map"></div>
 
-  <button id="locationButton">내 위치로 이동</button>  
+  <button id="locationButton">내 위치로 이동</button>
 
 <script>
   var map = new naver.maps.Map('map', {
@@ -37,9 +37,9 @@
     zoom: 17
   });
 
-  var markers = []; // 모든 마커 저장
-  var lifesavers = []; // 구조함 데이터 저장
-  var myLocationMarker = null; // 내 위치 파란 마커
+  var markers = [];
+  var lifesavers = [];
+  var myLocationMarker = null;
 
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
@@ -88,14 +88,20 @@
             });
             markers.push(marker);
 
-            // ✅ 마커 클릭 시 길찾기 바로 열기
-            naver.maps.Event.addListener(marker, 'click', function() {
-              const lat = item.lat;
-              const lon = item.lng;
-              const name = encodeURIComponent(item.name || "인명구조함");
+            // ✅ 마커 클릭 시 info window 열기 (길찾기 링크 포함)
+            var infoWindow = new naver.maps.InfoWindow({
+              content: `
+                <div style="padding:6px; font-size:13px;">
+                  ${item.name || "인명구조함"}<br>
+                  <a href="https://map.naver.com/v5/directions/null,null,null/${encodeURIComponent(item.name || "인명구조함")},${item.lat},${item.lng}" target="_blank" style="color:blue; text-decoration:underline;">
+                    길찾기
+                  </a>
+                </div>
+              `
+            });
 
-              const url = `https://map.naver.com/v5/directions/null,null,null/${name},${lat},${lon}`;
-              window.open(url, '_blank');
+            naver.maps.Event.addListener(marker, 'click', function() {
+              infoWindow.open(map, marker);
             });
           }
         });
@@ -129,7 +135,7 @@
     updateMarkers();
   });
 
-  loadMarkers(); // 구조함 데이터 불러오기
+  loadMarkers();
 
   document.getElementById('locationButton').addEventListener('click', function() {
     if (navigator.geolocation) {
