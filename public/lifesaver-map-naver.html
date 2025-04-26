@@ -88,12 +88,16 @@
             });
             markers.push(marker);
 
-            // ✅ 마커 클릭 시 info window 열기 (길찾기 링크 포함)
+            // ✅ 마커 클릭 시 info window 열기 + 새 포맷 링크
+            var destLat = item.lat;
+            var destLon = item.lng;
+            var destName = encodeURIComponent(item.name || "인명구조함");
+
             var infoWindow = new naver.maps.InfoWindow({
               content: `
                 <div style="padding:6px; font-size:13px;">
                   ${item.name || "인명구조함"}<br>
-                  <a href="https://map.naver.com/v5/directions/null,null,null/${encodeURIComponent(item.name || "인명구조함")},${item.lat},${item.lng}" target="_blank" style="color:blue; text-decoration:underline;">
+                  <a href="https://map.naver.com/p/directions?c=15.00,${destLat},${destLon}&placeSearch=${destName}&placeLat=${destLat}&placeLon=${destLon}" target="_blank" style="color:blue; text-decoration:underline;">
                     길찾기
                   </a>
                 </div>
