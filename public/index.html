@@ -17,13 +17,17 @@
     h1 {
       margin-bottom: 30px;
     }
+    .buttons {
+      display: flex;
+      gap: 20px;
+    }
     a {
-      margin: 10px;
       padding: 12px 24px;
       border: 2px solid #333;
       border-radius: 10px;
       text-decoration: none;
       font-size: 18px;
+      color: black;
     }
     a:hover {
       background-color: #f0f0f0;
@@ -32,7 +36,9 @@
 </head>
 <body>
   <h1>인명구조함 지도 선택</h1>
-  <a href="./lifesaver-map-kakao.html">카카오 지도 보기</a>
-  <a href="./lifesaver-map-naver.html">네이버 지도 보기</a>
+  <div class="buttons">
+    <a href="./lifesaver-map-naver.html">네이버 지도 보기</a>
+    <a href="./lifesaver-map-kakao.html">카카오 지도 보기</a>
+  </div>
 </body>
 </html>
