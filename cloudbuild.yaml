@@ -9,3 +9,5 @@ steps:
            '--allow-unauthenticated']
 images:
   - 'gcr.io/vigilant-host-458710-m2/lifesaver-api'
+options:
+  logging: CLOUD_LOGGING_ONLY
