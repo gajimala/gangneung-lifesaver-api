@@ -4,9 +4,10 @@ steps:
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['run', 'deploy', 'lifesaver-api',
            '--image', 'gcr.io/vigilant-host-458710-m2/lifesaver-api',
-           '--region', 'us-central1',  # ✅ 리전 변경
+           '--region', 'us-central1',
            '--platform', 'managed',
            '--allow-unauthenticated']
-
 images:
   - 'gcr.io/vigilant-host-458710-m2/lifesaver-api'
+options:
+  logging: CLOUD_LOGGING_ONLY
