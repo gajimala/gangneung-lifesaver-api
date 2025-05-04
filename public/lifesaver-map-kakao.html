@@ -56,8 +56,6 @@
         myLon = position.coords.longitude;
         var myLocation = new kakao.maps.LatLng(myLat, myLon);
 
-        // ❌ 지도는 이동하지 않고
-        // ✅ 내 위치 마커만 갱신
         if (myLocationMarker) {
           myLocationMarker.setPosition(myLocation);
         } else {
@@ -126,16 +124,19 @@
   }
 
   function updateMarkers() {
-    if (lifesavers.length === 0) return;
+    if (markers.length === 0) return;
 
     var bounds = map.getBounds();
     var sw = bounds.getSouthWest();
     var ne = bounds.getNorthEast();
 
-    markers.forEach(function(marker, index) {
-      var item = lifesavers[index];
-      if (item.lat >= sw.getLat() && item.lat <= ne.getLat() &&
-          item.lng >= sw.getLng() && item.lng <= ne.getLng()) {
+    markers.forEach(function(marker) {
+      var pos = marker.getPosition();
+      var lat = pos.getLat();
+      var lng = pos.getLng();
+
+      if (lat >= sw.getLat() && lat <= ne.getLat() &&
+          lng >= sw.getLng() && lng <= ne.getLng()) {
         marker.setMap(map);
       } else {
         marker.setMap(null);
@@ -145,10 +146,9 @@
 
   kakao.maps.event.addListener(map, 'bounds_changed', updateMarkers);
 
-  startTracking();  // 마커만 따라다님
+  startTracking();
   loadMarkers();
 
-  // ✅ 버튼 눌렀을 때만 지도 중심 이동
   document.getElementById('locationButton').addEventListener('click', function() {
     if (myLat && myLon) {
       const center = new kakao.maps.LatLng(myLat, myLon);
@@ -157,7 +157,6 @@
     }
   });
 
-  // 지도 타입 토글
   document.getElementById('mapTypeSelector').addEventListener('click', function() {
     if (map.getMapTypeId() === kakao.maps.MapTypeId.SKYVIEW) {
       map.setMapTypeId(kakao.maps.MapTypeId.NORMAL);
