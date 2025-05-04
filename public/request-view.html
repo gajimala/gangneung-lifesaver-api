@@ -23,7 +23,7 @@
     .then(res => res.json())
     .then(data => {
       data.forEach(req => {
-        const pos = new kakao.maps.LatLng(req.lat, req.lon);
+        const pos = new kakao.maps.LatLng(req.lat, req.lng); // ✅ 'lng'로 수정
         const marker = new kakao.maps.Marker({
           position: pos,
           map: map,
