@@ -15,7 +15,6 @@
       background: rgba(255, 255, 255, 0.9);
       border: 1px solid #ccc;
       border-radius: 4px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
       font-size: 14px;
       cursor: pointer;
     }
@@ -54,9 +53,8 @@
         myLon = position.coords.longitude;
         var myLocation = new naver.maps.LatLng(myLat, myLon);
 
-        map.setCenter(myLocation);
-        map.setZoom(17);
-
+        // 지도 중심은 이동 안 함 ❌
+        // 내 위치 마커만 갱신 ✅
         if (myLocationMarker) {
           myLocationMarker.setPosition(myLocation);
         } else {
@@ -82,9 +80,7 @@
 
   function loadMarkers() {
     fetch("https://kcg-lifesaver.koyeb.app/lifesavers.json")
-      .then(function(response) {
-        return response.json();
-      })
+      .then(function(response) { return response.json(); })
       .then(function(data) {
         lifesavers = data;
         data.forEach(function(item) {
@@ -154,11 +150,15 @@
 
   naver.maps.Event.addListener(map, 'bounds_changed', updateMarkers);
 
-  startTracking();  // 자동 위치 추적 시작
+  startTracking();  // 마커만 따라다님
   loadMarkers();
 
   document.getElementById('locationButton').addEventListener('click', function() {
-    startTracking();  // 다시 추적 시작
+    if (myLat && myLon) {
+      const center = new naver.maps.LatLng(myLat, myLon);
+      map.setCenter(center);
+      map.setZoom(17);
+    }
   });
 
   document.getElementById('mapTypeSelector').addEventListener('click', function() {
