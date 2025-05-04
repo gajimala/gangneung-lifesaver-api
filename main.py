@@ -8,15 +8,15 @@ from fastapi.responses import FileResponse
 
 app = FastAPI()
 
-# 정적 파일 서빙
-app.mount("/", StaticFiles(directory="public", html=True), name="static")
+# ✅ 정적 파일을 /static 아래에서 서빙
+app.mount("/static", StaticFiles(directory="public"), name="static")
 
-REQUESTS_FILE = "requests.json"  # public에서 루트로 변경
+REQUESTS_FILE = "requests.json"
 
 class HelpRequest(BaseModel):
     lat: float
     lon: float
-    timestamp: float  # ms
+    timestamp: float
 
 @app.post("/request-help")
 def request_help(data: HelpRequest):
@@ -29,10 +29,7 @@ def request_help(data: HelpRequest):
             requests = json.load(f)
 
         now = time.time() * 1000
-        recent_requests = [
-            r for r in requests if now - r.get("timestamp", 0) < 86400000
-        ]
-
+        recent_requests = [r for r in requests if now - r.get("timestamp", 0) < 86400000]
         recent_requests.append(data.dict())
 
         with open(REQUESTS_FILE, "w", encoding="utf-8") as f:
@@ -52,11 +49,9 @@ def get_lifesavers():
     try:
         with open("public/lifesavers.json", encoding="utf-8") as f:
             data = json.load(f)
-
         for item in data:
             if "lon" in item:
                 item["lng"] = item.pop("lon")
-
         return data
     except Exception as e:
         return {"status": "error", "message": str(e)}
