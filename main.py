@@ -21,6 +21,8 @@ class HelpRequest(BaseModel):
 @app.post("/request-help")
 def request_help(data: HelpRequest):
     try:
+        print(">> 구조요청 수신됨:", data.dict())  # ✅ 로그 추가
+        
         if not os.path.exists(REQUESTS_FILE):
             with open(REQUESTS_FILE, "w", encoding="utf-8") as f:
                 json.dump([], f)
