@@ -11,6 +11,11 @@ app = FastAPI()
 # ✅ 정적 파일을 /static 아래에서 서빙
 app.mount("/static", StaticFiles(directory="public"), name="static")
 
+# ✅ 루트 접근 시 index.html 반환
+@app.get("/")
+def serve_root():
+    return FileResponse("public/index.html")
+
 REQUESTS_FILE = "/tmp/requests.json"
 
 class HelpRequest(BaseModel):
@@ -21,7 +26,7 @@ class HelpRequest(BaseModel):
 @app.post("/request-help")
 def request_help(data: HelpRequest):
     try:
-        print(">> 구조요청 수신됨:", data.dict())  # ✅ 로그 추가
+        print(">> 구조요청 수신됨:", data.dict())
         
         if not os.path.exists(REQUESTS_FILE):
             with open(REQUESTS_FILE, "w", encoding="utf-8") as f:
