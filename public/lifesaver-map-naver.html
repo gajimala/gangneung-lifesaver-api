@@ -47,14 +47,14 @@
   var infoWindow = new naver.maps.InfoWindow();
 
   function startTracking() {
+    let hasCenteredOnce = false;
+
     if (navigator.geolocation) {
       watchId = navigator.geolocation.watchPosition(function(position) {
         myLat = position.coords.latitude;
         myLon = position.coords.longitude;
         var myLocation = new naver.maps.LatLng(myLat, myLon);
 
-        // 지도 중심은 이동 안 함 ❌
-        // 내 위치 마커만 갱신 ✅
         if (myLocationMarker) {
           myLocationMarker.setPosition(myLocation);
         } else {
@@ -66,6 +66,11 @@
               anchor: new naver.maps.Point(6, 6)
             }
           });
+        }
+
+        if (!hasCenteredOnce) {
+          map.setCenter(myLocation);
+          hasCenteredOnce = true;
         }
       }, function(error) {
         console.error("위치 추적 실패:", error);
@@ -150,7 +155,7 @@
 
   naver.maps.Event.addListener(map, 'bounds_changed', updateMarkers);
 
-  startTracking();  // 마커만 따라다님
+  startTracking();
   loadMarkers();
 
   document.getElementById('locationButton').addEventListener('click', function() {
