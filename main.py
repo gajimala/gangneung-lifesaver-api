@@ -4,13 +4,14 @@ import time
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 app = FastAPI()
 
 # 정적 파일 서빙
 app.mount("/", StaticFiles(directory="public", html=True), name="static")
 
-REQUESTS_FILE = "public/requests.json"
+REQUESTS_FILE = "requests.json"  # public에서 루트로 변경
 
 class HelpRequest(BaseModel):
     lat: float
@@ -41,6 +42,10 @@ def request_help(data: HelpRequest):
 
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+@app.get("/requests.json")
+def serve_requests_json():
+    return FileResponse(REQUESTS_FILE, media_type="application/json")
 
 @app.get("/lifesavers")
 def get_lifesavers():
