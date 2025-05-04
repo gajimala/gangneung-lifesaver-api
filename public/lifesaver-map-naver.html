@@ -7,8 +7,9 @@
   <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=y6akfogygp"></script>
   <style>
     html, body, #map { width: 100%; height: 100%; margin: 0; padding: 0; }
-    #locationButton, #mapTypeSelector {
+    #mapTypeSelector {
       position: absolute;
+      top: 10px;
       left: 10px;
       z-index: 100;
       padding: 6px 10px;
@@ -16,51 +17,42 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       font-size: 14px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
       cursor: pointer;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     }
-    #locationButton { top: 10px; }
-    #mapTypeSelector { top: 50px; }
   </style>
 </head>
 <body>
 
 <div id="map"></div>
-<button id="locationButton">내 위치로 이동</button>
 <button id="mapTypeSelector">위성 지도</button>
 
 <script>
-  var map = new naver.maps.Map('map', {
+  const map = new naver.maps.Map('map', {
     center: new naver.maps.LatLng(37.5665, 126.9780),
     zoom: 17,
     mapTypeId: naver.maps.MapTypeId.NORMAL
   });
 
-  var markers = [];
-  var lifesavers = [];
-  var myLocationMarker = null;
-  var myLat = null;
-  var myLon = null;
-  var infoWindow = new naver.maps.InfoWindow();
+  let markers = [];
+  let lifesavers = [];
+  let myLocationMarker = null;
+  let myLat = null, myLon = null;
+  const infoWindow = new naver.maps.InfoWindow();
 
-  // 지도 로드 완료 후 내 위치 잡기
-  naver.maps.Event.once(map, 'init', function () {
-    getMyLocation();
-  });
-
-  function getMyLocation() {
+  // ✅ 내 위치를 실시간으로 추적하고 지도 중심을 따라가게 함
+  function startAutoTracking() {
     if (!navigator.geolocation) {
       console.error("브라우저가 위치 정보를 지원하지 않습니다.");
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(function(position) {
+    navigator.geolocation.watchPosition(function(position) {
       myLat = position.coords.latitude;
       myLon = position.coords.longitude;
-      var myLocation = new naver.maps.LatLng(myLat, myLon);
+      const myLocation = new naver.maps.LatLng(myLat, myLon);
 
-      map.setCenter(myLocation);
-      map.setZoom(17);
+      map.setCenter(myLocation);  // 지도 중심 이동
 
       if (myLocationMarker) {
         myLocationMarker.setPosition(myLocation);
@@ -75,22 +67,23 @@
         });
       }
     }, function(error) {
-      console.error("위치 정보를 가져올 수 없습니다:", error);
+      console.error("위치 추적 오류:", error);
     }, {
       enableHighAccuracy: true,
-      timeout: 10000
+      timeout: 10000,
+      maximumAge: 0
     });
   }
 
   function loadMarkers() {
     fetch("https://gangneung-lifesaver-api.onrender.com/lifesavers.json")
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
         lifesavers = data;
 
-        data.forEach(function(item) {
+        data.forEach(item => {
           if (item.lat && item.lng) {
-            var marker = new naver.maps.Marker({
+            const marker = new naver.maps.Marker({
               position: new naver.maps.LatLng(item.lat, item.lng),
               map: map,
               title: item.name || "인명구조함",
@@ -102,6 +95,7 @@
                 anchor: new naver.maps.Point(13, 30)
               }
             });
+
             markers.push(marker);
 
             naver.maps.Event.addListener(marker, 'click', function () {
@@ -110,10 +104,10 @@
                 return;
               }
 
-              var appname = 'com.example.app'; // 패키지명 등록 가능
-              var nmapUrl = `nmap://route/car?slat=${myLat}&slng=${myLon}&dlat=${item.lat}&dlng=${item.lng}&appname=${appname}`;
+              const appname = 'com.example.app';
+              const nmapUrl = `nmap://route/car?slat=${myLat}&slng=${myLon}&dlat=${item.lat}&dlng=${item.lng}&appname=${appname}`;
 
-              var iwContent = `
+              const iwContent = `
                 <div style="padding:6px; font-size:13px;">
                   ${item.name || "인명구조함"}<br>
                   <button onclick="window.location.href='${nmapUrl}'"
@@ -131,7 +125,7 @@
 
         updateMarkers();
       })
-      .catch(function(error) {
+      .catch(error => {
         console.error('lifesavers.json 불러오기 오류:', error);
       });
   }
@@ -139,12 +133,12 @@
   function updateMarkers() {
     if (lifesavers.length === 0) return;
 
-    var bounds = map.getBounds();
-    var sw = bounds.getSW();
-    var ne = bounds.getNE();
+    const bounds = map.getBounds();
+    const sw = bounds.getSW();
+    const ne = bounds.getNE();
 
-    markers.forEach(function(marker, index) {
-      var item = lifesavers[index];
+    markers.forEach((marker, index) => {
+      const item = lifesavers[index];
       if (item.lat >= sw._lat && item.lat <= ne._lat &&
           item.lng >= sw._lng && item.lng <= ne._lng) {
         marker.setMap(map);
@@ -154,16 +148,9 @@
     });
   }
 
-  naver.maps.Event.addListener(map, 'bounds_changed', function () {
-    updateMarkers();
-  });
+  naver.maps.Event.addListener(map, 'bounds_changed', updateMarkers);
 
-  loadMarkers();
-
-  document.getElementById('locationButton').addEventListener('click', function () {
-    getMyLocation();
-  });
-
+  // 지도 종류 전환 버튼
   document.getElementById('mapTypeSelector').addEventListener('click', function () {
     if (map.getMapTypeId() === naver.maps.MapTypeId.SATELLITE) {
       map.setMapTypeId(naver.maps.MapTypeId.NORMAL);
@@ -173,6 +160,12 @@
       this.textContent = '일반 지도';
     }
   });
+
+  // 실행
+  naver.maps.Event.once(map, 'init', function () {
+    startAutoTracking();
+  });
+  loadMarkers();
 </script>
 
 </body>
