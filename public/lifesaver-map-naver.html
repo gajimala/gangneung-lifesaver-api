@@ -48,12 +48,12 @@
 
   function startTracking() {
     if (navigator.geolocation) {
-      watchId = navigator.geolocation.watchPosition(function(position) {
+      navigator.geolocation.getCurrentPosition(function(position) {
         myLat = position.coords.latitude;
         myLon = position.coords.longitude;
         var myLocation = new naver.maps.LatLng(myLat, myLon);
 
-        // 내 위치 마커만 갱신하고, 지도는 이동하지 않음
+        // 내 위치 마커만 갱신하고, 지도는 이동
         if (myLocationMarker) {
           myLocationMarker.setPosition(myLocation);
         } else {
@@ -66,6 +66,10 @@
             }
           });
         }
+
+        // 첫 로드 시 내 위치로 줌과 중심 이동
+        map.setCenter(myLocation);
+        map.setZoom(17);  // 줌 레벨 설정
       }, function(error) {
         console.error("위치 추적 실패:", error);
       }, {
