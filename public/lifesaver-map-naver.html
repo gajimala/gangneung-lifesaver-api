@@ -33,7 +33,7 @@
 
 <script>
   var map = new naver.maps.Map('map', {
-    center: new naver.maps.LatLng(37.5665, 126.9780),  // 초기 위치 설정
+    center: new naver.maps.LatLng(37.5665, 126.9780),  // 초기 위치 설정 (서울)
     zoom: 17,
     mapTypeId: naver.maps.MapTypeId.NORMAL
   });
@@ -46,14 +46,19 @@
   var watchId = null;
   var infoWindow = new naver.maps.InfoWindow();
 
-  function startTracking() {
+  // 첫 화면에서 내 위치로 줌
+  function getLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function(position) {
         myLat = position.coords.latitude;
         myLon = position.coords.longitude;
         var myLocation = new naver.maps.LatLng(myLat, myLon);
 
-        // 내 위치 마커만 갱신하고, 지도는 이동
+        // 내 위치로 지도 중심 이동 및 줌 설정
+        map.setCenter(myLocation);
+        map.setZoom(17);
+
+        // 내 위치 마커 설정
         if (myLocationMarker) {
           myLocationMarker.setPosition(myLocation);
         } else {
@@ -66,10 +71,37 @@
             }
           });
         }
+      }, function(error) {
+        console.error("위치 추적 실패:", error);
+      }, {
+        enableHighAccuracy: true,
+        maximumAge: 0
+      });
+    } else {
+      console.error("Geolocation 미지원");
+    }
+  }
 
-        // 첫 로드 시 내 위치로 줌과 중심 이동
-        map.setCenter(myLocation);
-        map.setZoom(17);  // 줌 레벨 설정
+  function startTracking() {
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(function(position) {
+        myLat = position.coords.latitude;
+        myLon = position.coords.longitude;
+        var myLocation = new naver.maps.LatLng(myLat, myLon);
+
+        // 내 위치 마커만 갱신하고, 지도는 이동하지 않음
+        if (myLocationMarker) {
+          myLocationMarker.setPosition(myLocation);
+        } else {
+          myLocationMarker = new naver.maps.Marker({
+            position: myLocation,
+            map: map,
+            icon: {
+              content: '<div style="width:12px; height:12px; background:#4285F4; border-radius:50%; border:2px solid white;"></div>',
+              anchor: new naver.maps.Point(6, 6)
+            }
+          });
+        }
       }, function(error) {
         console.error("위치 추적 실패:", error);
       }, {
@@ -153,6 +185,7 @@
 
   naver.maps.Event.addListener(map, 'bounds_changed', updateMarkers);
 
+  getLocation();  // 첫 로드 시 내 위치로 자동 이동
   startTracking();  // 내 위치만 따라다님
   loadMarkers();
 
