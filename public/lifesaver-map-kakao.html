@@ -42,7 +42,7 @@
   let myLocationMarker = null;
   const infoWindow = new kakao.maps.InfoWindow();
 
-  // 지도 준비되면 내 위치로 이동
+  // 지도 로딩 후 자동으로 내 위치로 이동
   kakao.maps.event.addListenerOnce(map, 'tilesloaded', function() {
     getMyLocation();
   });
