@@ -56,9 +56,8 @@
         myLon = position.coords.longitude;
         var myLocation = new kakao.maps.LatLng(myLat, myLon);
 
-        map.setCenter(myLocation);
-        map.setLevel(5);
-
+        // ❌ 지도는 이동하지 않고
+        // ✅ 내 위치 마커만 갱신
         if (myLocationMarker) {
           myLocationMarker.setPosition(myLocation);
         } else {
@@ -146,13 +145,19 @@
 
   kakao.maps.event.addListener(map, 'bounds_changed', updateMarkers);
 
-  startTracking(); // 초기 위치 자동 추적 시작
+  startTracking();  // 마커만 따라다님
   loadMarkers();
 
+  // ✅ 버튼 눌렀을 때만 지도 중심 이동
   document.getElementById('locationButton').addEventListener('click', function() {
-    startTracking(); // 다시 추적 시작
+    if (myLat && myLon) {
+      const center = new kakao.maps.LatLng(myLat, myLon);
+      map.setCenter(center);
+      map.setLevel(5);
+    }
   });
 
+  // 지도 타입 토글
   document.getElementById('mapTypeSelector').addEventListener('click', function() {
     if (map.getMapTypeId() === kakao.maps.MapTypeId.SKYVIEW) {
       map.setMapTypeId(kakao.maps.MapTypeId.NORMAL);
