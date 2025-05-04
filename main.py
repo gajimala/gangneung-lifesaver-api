@@ -11,7 +11,7 @@ app = FastAPI()
 # ✅ 정적 파일을 /static 아래에서 서빙
 app.mount("/static", StaticFiles(directory="public"), name="static")
 
-REQUESTS_FILE = "requests.json"
+REQUESTS_FILE = "/tmp/requests.json"
 
 class HelpRequest(BaseModel):
     lat: float
